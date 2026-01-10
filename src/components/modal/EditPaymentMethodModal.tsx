@@ -129,7 +129,7 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
             swiftCode: details.swiftCode || "",
             routingNumber: details.routingNumber || "",
           });
-        } else if (paymentMethod.type === "crypto") {
+        } else if (paymentMethod.type === "Cryptocurrency") {
           setCrypto({
             walletAddress: details.walletAddress || "",
             network: details.cryptoNetwork || "",
@@ -201,7 +201,7 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
           routingNumber: bank.routingNumber,
         };
         break;
-      case "crypto":
+      case "Cryptocurrency":
         updatedPaymentMethod.details = {
           walletAddress: crypto.walletAddress,
           cryptoNetwork: crypto.network,
@@ -314,7 +314,7 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
             <div className="flex flex-col gap-2">
               <label className="text-[14px]">Wallet Address</label>
               <div className="flex gap-2">
-                {!isConnected ? (
+                {!isConnected && !crypto.walletAddress ? (
                   <Button
                     variant="secondary"
                     onClick={async () => {
@@ -329,7 +329,7 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
                     <Plugs size={18} />
                     {isConnecting ? "Connecting..." : "Connect Wallet"}
                   </Button>
-                ) : (
+                ) : isConnected ? (
                   <div className="flex-1 flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-[8px]">
                     <WalletIcon size={18} className="text-green-600" />
                     <span className="text-[12px] text-green-600 font-medium">
@@ -338,14 +338,20 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
                     <button
                       onClick={() => {
                         disconnectWallet();
-                        setCrypto({ ...crypto, walletAddress: "" });
                       }}
                       className="ml-auto text-[12px] text-red-600 hover:underline"
                     >
                       Disconnect
                     </button>
                   </div>
-                )}
+                ) : crypto.walletAddress ? (
+                  <div className="flex-1 flex items-center gap-2 p-3 bg-gray-50 border border-gray-200 rounded-[8px]">
+                    <WalletIcon size={18} className="text-gray-600" />
+                    <span className="text-[12px] text-gray-600 font-medium">
+                      Saved: {crypto.walletAddress.substring(0, 6)}...{crypto.walletAddress.substring(crypto.walletAddress.length - 4)}
+                    </span>
+                  </div>
+                ) : null}
               </div>
               {walletError && (
                 <p className="text-[12px] text-red-500">{walletError}</p>
@@ -353,11 +359,11 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
             </div>
 
             <Input
-              label="Or Enter Manually"
+              label="Wallet Address"
               name="walletAddress"
               value={crypto.walletAddress}
               onChange={(e) => setCrypto({ ...crypto, walletAddress: e.target.value })}
-              placeholder="Enter wallet address"
+              placeholder="Enter wallet address manually"
               error={errors.walletAddress}
             />
             <Dropdown
