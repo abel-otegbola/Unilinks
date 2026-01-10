@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --font-questrial: 'Questrial', sans-serif;
+}
+
+@theme inline {
+  --color-primary: #8257E5;
+  --color-secondary: #E1E1E6;
+  --color-accent: #04D361;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-questrial);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-questrial), sans-serif;
+}
+
+.btn-bg {
+  background: linear-gradient(96deg, #D437ED 5.3%, #C4674B 33.08%, #D9EF34 62.81%, #8263F4 88.72%);
+  filter: blur(10px);
+  opacity: 1;
+}
+
