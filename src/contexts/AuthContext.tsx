@@ -62,7 +62,7 @@ const AuthProvider = ({ children }: { children: ReactNode}) => {
         timestamp: Date.now() 
       });
 
-      navigate(callbackUrl || "/dashboard");
+      navigate(callbackUrl || "/account");
     } catch (error: unknown) {
         let msg = "Login failed";
         if (error && typeof error === "object" && "code" in error) {
@@ -122,7 +122,7 @@ const AuthProvider = ({ children }: { children: ReactNode}) => {
         timestamp: Date.now() 
       });
 
-      navigate("/dashboard");
+      navigate("/account");
     } catch (error: unknown) {
         let msg = "Signup failed";
         if (error && typeof error === "object" && "code" in error) {
@@ -191,7 +191,7 @@ const AuthProvider = ({ children }: { children: ReactNode}) => {
         timestamp: Date.now() 
       });
 
-      navigate("/dashboard");
+      navigate("/account");
     } catch (error: unknown) {
         let msg = "Social sign-in failed";
         if (error && typeof error === "object" && "code" in error) {
