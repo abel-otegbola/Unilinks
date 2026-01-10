@@ -19,7 +19,7 @@ function Dashboard() {
                 <h1 className="md:text-[18px] text-[16px] font-medium capitalize leading-[28px]">Overview</h1>
 
                 <div className="grid md:grid-cols-4 grid-cols-2 border border-gray-500/[0.1] bg-gray-50 gap-1 rounded-lg p-1">
-                  <div className="flex flex-col gap-2 px-12 py-8 rounded border border-gray-500/[0.1] bg-white">
+                  <div className="flex flex-col gap-2 md:px-12 md:py-8 p-4 rounded border border-gray-500/[0.1] bg-white">
                     <h2 className="font-semibold">Overall Links</h2>
                     <div className="flex flex-col">
                       <div className="flex gap-2 items-end">
@@ -30,7 +30,7 @@ function Dashboard() {
                     </div>
                   </div>
 
-                   <div className="flex flex-col gap-2 px-12 py-8 rounded border border-gray-500/[0.1] bg-white">
+                   <div className="flex flex-col gap-2 md:px-12 md:py-8 p-4 rounded border border-gray-500/[0.1] bg-white">
                     <h2 className="font-semibold">Active Links</h2>
                     <div className="flex flex-col">
                       <div className="flex gap-2 items-end">
@@ -41,7 +41,7 @@ function Dashboard() {
                     </div>
                   </div>
 
-                   <div className="flex flex-col gap-2 px-12 py-8 rounded border border-gray-500/[0.1] bg-white">
+                   <div className="flex flex-col gap-2 md:px-12 md:py-8 p-4 rounded border border-gray-500/[0.1] bg-white">
                     <h2 className="font-semibold">Expired Links</h2>
                     <div className="flex flex-col">
                       <div className="flex gap-2 items-end">
@@ -52,7 +52,7 @@ function Dashboard() {
                     </div>
                   </div>
 
-                   <div className="flex flex-col gap-2 px-12 py-8 rounded border border-gray-500/[0.1] bg-white">
+                   <div className="flex flex-col gap-2 md:px-12 md:py-8 p-4 rounded border border-gray-500/[0.1] bg-white">
                     <h2 className="font-semibold">Total Revenue</h2>
                     <div className="flex flex-col">
                       <div className="flex gap-2 items-end">
