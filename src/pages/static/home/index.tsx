@@ -1,17 +1,28 @@
 import { CurrencyCircleDollarIcon, ChartLineUpIcon, ShareNetworkIcon } from "@phosphor-icons/react";
 import Button from "../../../components/button/Button";
+import { useContext } from "react";
+import { AuthContext } from "../../../contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 export default function Homepage() {
+  const { user } = useContext(AuthContext);
+
   return (
     <main className="bg-[url('/bg.svg')] bg-cover bg-top min-h-screen flex flex-col">
-      <header className="flex justify-between 2xl:p-8 md:p-6 p-4 items-center">
+      <header className="flex justify-between items-center sticky top-4 sm:w-[400px] w-[calc(100%-32px)] bg-white/[0.8] backdrop-blur-sm border-2 border-white shadow-sm rounded-full mx-auto p-2 pl-4 mt-4 items-center">
         <img src="/logo.svg" alt="UniLinks logo" width={64} height={32} />
 
+        {user ? (
+          <Link to="/account">
+            <img src="/profile.jpg" alt="Profile" className="w-10 h-10 rounded-full shadow border border-white outline outline-primary/[0.2] outline-offset-2" />
+          </Link>
+        ) : (
         <Button variant="secondary" href="/auth/login">Login</Button>
+        )}
       </header>
 
       <section className="flex flex-col sm:items-center 2xl:gap-8 md:gap-6 gap-4 2xl:p-12 md:p-10 p-4 py-24">
-        <h2 className="text-[48px] max-w-2xl leading-[120%] font-semibold sm:text-center">
+        <h2 className="md:text-[48px] text-[40px] max-w-2xl leading-[120%] font-semibold sm:text-center">
           Universal Payment Link Generator
         </h2>
 
