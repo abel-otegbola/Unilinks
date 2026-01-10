@@ -15,7 +15,7 @@ export default function Homepage() {
         </h2>
 
         <p className="text-center max-w-2xl leading-[24px] mb-4">
-          Create and share professional payment links instantly with ease. No technical skills required—just set your amount, choose your payment method, and generate a shareable link. Our intelligent platform helps you manage payments, track activity, and get paid faster across multiple currencies and payment methods.
+          Generate professional payment links in seconds. Set your amount, choose your payment method, and share. Track activity and get paid faster across multiple currencies.
         </p>
 
         <div className="relative">
