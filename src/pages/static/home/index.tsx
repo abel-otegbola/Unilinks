@@ -4,7 +4,7 @@ export default function Homepage() {
   return (
     <main className="bg-[url('/bg.svg')] bg-cover bg-top min-h-screen flex flex-col">
       <header className="flex justify-between 2xl:p-8 md:p-6 p-4 items-center">
-        <img src="/logo.svg" alt="UniLinks logo" width={120} height={40} />
+        <img src="/logo.svg" alt="UniLinks logo" width={64} height={32} />
 
         <Button variant="secondary" href="/auth/login">Login</Button>
       </header>
