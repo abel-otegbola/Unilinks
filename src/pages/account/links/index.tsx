@@ -49,7 +49,7 @@ function PaymentLinks() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-wrap gap-6 justify-between items-center ">
         <div>
             <h1 className="md:text-[18px] text-[16px] font-medium capitalize leading-[28px]">Payment links</h1>
         </div>
