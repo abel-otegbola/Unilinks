@@ -57,6 +57,30 @@ export default function Homepage() {
           </div>
         </div>
       </section>
+
+      <section className="flex flex-col gap-10 lg:p-[6%] md:p-[3%] p-4 mb-12">
+          <div className="flex flex-col justify-center items-center gap-4 mb-10">
+            <p className="font-medium text-primary uppercase">Why us</p>
+            <h2 className="text-[42px] font-medium leading-[110%]">Why they prefer Unilinks</h2>
+          </div>
+
+          <div className="flex md:flex-nowrap flex-wrap gap-[32px]">
+            <div className="flex flex-col md:w-[50%] w-full gap-4 bg-primary/[0.08] rounded-lg p-6">
+              <h3 className="font-medium text-[80px] font-semibold">5+</h3>
+              <p>Payment gateways you can choose from</p>
+            </div>
+            <div className="flex flex-col justify-between md:w-[50%] w-full gap-4 bg-primary/[0.08] rounded-lg p-6">
+              <h3 className="font-semibold text-lg">Robust Security</h3>
+              <p>We prioritize your security with advanced encryption and compliance measures to protect your transactions and data.</p>
+            </div>
+          </div>
+          <div className="flex md:flex-nowrap flex-wrap w-full gap-4 bg-primary/[0.08] rounded-lg p-6 h-[400px]">
+            <div className="flex flex-col justify-center gap-8 md:w-[30%]">
+              <h3 className="font-semibold text-lg">Real-Time Analytics</h3>
+              <p>Track all your payment links with comprehensive dashboards, activity timelines, and instant notifications for every transaction.</p>
+            </div>
+          </div>
+      </section>
     </main>
   );
 }
