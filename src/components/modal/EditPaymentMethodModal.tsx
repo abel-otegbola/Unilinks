@@ -424,10 +424,7 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
 
         {/* Action Buttons */}
         <div className="flex gap-3 mt-4">
-          <Button variant="secondary" onClick={handleClose} className="flex-1">
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} className="flex-1">
+          <Button onClick={handleSubmit} className="w-full whitespace-nowrap">
             Update Payment Method
           </Button>
         </div>

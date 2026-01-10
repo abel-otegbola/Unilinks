@@ -157,16 +157,9 @@ export default function AddPaymentLinkModal({ isOpen, onClose }: AddPaymentLinkM
         {/* Action Buttons */}
         <div className="flex gap-3 pb-4">
           <Button
-            type="button"
-            onClick={handleClose}
-            className="flex-1 bg-gray-200 text-gray-700 hover:bg-gray-300"
-          >
-            Cancel
-          </Button>
-          <Button
             type="submit"
             disabled={isLoading}
-            className="flex-1 bg-primary text-white hover:bg-primary/90 disabled:opacity-50"
+            className="w-full bg-primary text-white hover:bg-primary/90 disabled:opacity-50"
           >
             {isLoading ? "Creating..." : "Create Link"}
           </Button>
