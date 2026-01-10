@@ -24,7 +24,7 @@ function Dashboard() {
                 <h1 className="md:text-[18px] text-[16px] font-medium capitalize leading-[28px]">Overview</h1>
 
                 <div className="grid md:grid-cols-4 grid-cols-2 border border-gray-500/[0.1] bg-gray-50 gap-1 rounded-lg p-1">
-                  <div className="flex flex-col gap-2 md:px-6 md:py-6 p-4 rounded border border-gray-500/[0.1] bg-white">
+                  <div className="flex flex-col gap-2 md:md:py-6 p-4 rounded border border-gray-500/[0.1] bg-white">
                     <h2 className="font-semibold">Overall Links</h2>
                     <div className="flex flex-col">
                       <div className="flex gap-2 justify-end flex-wrap flex-col">
@@ -35,7 +35,7 @@ function Dashboard() {
                     </div>
                   </div>
 
-                   <div className="flex flex-col gap-2 md:px-6 md:py-6 p-4 rounded border border-gray-500/[0.1] bg-white">
+                   <div className="flex flex-col gap-2 md:md:py-6 p-4 rounded border border-gray-500/[0.1] bg-white">
                     <h2 className="font-semibold">Active Links</h2>
                     <div className="flex flex-col">
                       <div className="flex gap-2 justify-end flex-wrap flex-col">
@@ -46,7 +46,7 @@ function Dashboard() {
                     </div>
                   </div>
 
-                   <div className="flex flex-col gap-2 md:px-6 md:py-6 p-4 rounded border border-gray-500/[0.1] bg-white">
+                   <div className="flex flex-col gap-2 md:md:py-6 p-4 rounded border border-gray-500/[0.1] bg-white">
                     <h2 className="font-semibold">Expired Links</h2>
                     <div className="flex flex-col">
                       <div className="flex gap-2 justify-end flex-wrap flex-col">
@@ -57,7 +57,7 @@ function Dashboard() {
                     </div>
                   </div>
 
-                   <div className="flex flex-col gap-2 md:px-6 md:py-6 p-4 rounded border border-gray-500/[0.1] bg-white">
+                   <div className="flex flex-col gap-2 md:md:py-6 p-4 rounded border border-gray-500/[0.1] bg-white">
                     <h2 className="font-semibold">Total Revenue</h2>
                     <div className="flex flex-col">
                       <div className="flex gap-2 justify-end flex-wrap flex-col">
@@ -81,18 +81,18 @@ function Dashboard() {
                           <table className="w-full rounded-lg border border-gray-200 overflow-hidden">
                             <thead className="bg-gray-50 border border-gray-200">
                               <tr className="">
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th className="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
+                                <th className="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                <th className="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                               </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                               {
                                 paymentLinks.slice(0, 5).map((link) => (
                                   <tr key={link.id} className="border border-gray-500/[0.1] rounded-lg">
-                                    <td className="px-6 py-4 whitespace-nowrap">{link.reference}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{link.currency}{link.amount}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap"><p className={`w-fit rounded-full px-2 py-1 ${getStatusColor(link.status)}`}>{link.status}</p></td>
+                                    <td className="py-4 whitespace-nowrap">{link.reference}</td>
+                                    <td className="py-4 whitespace-nowrap">{link.currency}{link.amount}</td>
+                                    <td className="py-4 whitespace-nowrap"><p className={`w-fit rounded-full px-2 py-1 ${getStatusColor(link.status)}`}>{link.status}</p></td>
                                   </tr>
                                 ))
                               }
