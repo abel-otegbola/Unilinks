@@ -1,3 +1,4 @@
+import { CurrencyCircleDollarIcon, ChartLineUpIcon, ShareNetworkIcon } from "@phosphor-icons/react";
 import Button from "../../../components/button/Button";
 
 export default function Homepage() {
@@ -9,25 +10,53 @@ export default function Homepage() {
         <Button variant="secondary" href="/auth/login">Login</Button>
       </header>
 
-      <section className="flex flex-col items-center 2xl:gap-8 md:gap-6 gap-4 2xl:p-12 md:p-10 p-6">
-        <h2 className="2xl:text-[48px] md:text-[40px] text-[32px] max-w-2xl md:leading-[40px] leading-[40px] font-semibold text-center">
+      <section className="flex flex-col sm:items-center 2xl:gap-8 md:gap-6 gap-4 2xl:p-12 md:p-10 p-4 py-24">
+        <h2 className="text-[48px] max-w-2xl leading-[120%] font-semibold sm:text-center">
           Universal Payment Link Generator
         </h2>
 
-        <p className="text-center max-w-2xl leading-[24px] mb-4">
+        <p className="sm:text-center max-w-2xl leading-[24px] mb-4">
           Generate professional payment links in seconds. Set your amount, choose your payment method, and share. Track activity and get paid faster across multiple currencies.
         </p>
 
-        <div className="relative">
-          <div className="absolute dark:top-[5%] top-[5%] left-[1%] w-[98%] dark:h-[90%] h-[90%] z-[-1] btn-bg p-2 backdrop-blur-[15px] rounded-[12px] bg-opacity-80 ">
-          </div>
-          <Button className="z-2" href="/auth/login">Get Started for free</Button>
-        </div>
+        <Button className="z-2" href="/auth/login">Get Started for free</Button>
       </section>
 
-      <div className="p-4">
+      <div className="p-4 mb-6">
         <img src="/hero-bg.png" alt="UniLinks app mockup" width={1920} height={1080} className="md:w-[75%] w-full h-auto mt-auto mx-auto" />
       </div>
+
+      <section className="flex flex-col gap-10 lg:p-[6%] md:p-[3%] p-4 md:mx-[5%] mb-12 md:shadow-lg rounded-[12px] bg-white">
+        <div className="grid md:grid-cols-2 items-center gap-[60px]">
+          <div className="flex flex-col gap-4">
+            <p className="font-medium text-primary uppercase">Secure payment</p>
+            <h2 className="text-[42px] font-medium leading-[110%]">Experience that grows with your business</h2>
+          </div>
+          <div className="flex items-center md:justify-center">
+            <p className="md:w-[75%]">
+              Our platform is built with scalability in mind, ensuring that as your business expands, our services adapt to meet your evolving payment needs seamlessly.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-3 items-center gap-[60px]">
+          <div className="flex flex-col gap-4">
+            <p className="md:text-[40px] text-[32px] text-primary"><CurrencyCircleDollarIcon /></p>
+            <h2 className="font-medium">Multiple Payment Methods</h2>
+            <p className="">Support for bank transfers, cryptocurrency, PayPal, Stripe, and more. Accept payments through your preferred channels.</p>
+          </div>
+          <div className="flex flex-col gap-4">
+            <p className="md:text-[40px] text-[32px] text-primary"><ChartLineUpIcon /></p>
+            <h2 className="font-medium">Real-Time Tracking</h2>
+            <p className="">Track payment activity with detailed timelines. Monitor link status, expiration dates, and payment completion in real-time.</p>
+          </div>
+          <div className="flex flex-col gap-4">
+            <p className="md:text-[40px] text-[32px] text-primary"><ShareNetworkIcon /></p>
+            <h2 className="font-medium">Easy Sharing</h2>
+            <p className="">Generate unique payment links in seconds. Copy and share via email, social media, or any messaging platform with one click.</p>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
