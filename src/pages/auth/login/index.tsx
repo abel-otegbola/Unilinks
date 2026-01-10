@@ -34,7 +34,7 @@ export default function Login() {
               initialValues={{ email: "", password: "" }}
               validationSchema={loginSchema}
               onSubmit={(values, { setSubmitting }) => {
-                login(values.email, values.password, rememberMe, callbackURL || "/dashboard");
+                login(values.email, values.password, rememberMe, callbackURL || "/account");
                 setSubmitting(false);
               }}
             >
