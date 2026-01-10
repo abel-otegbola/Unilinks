@@ -17,7 +17,7 @@ export default function Homepage() {
             <img src="/profile.jpg" alt="Profile" className="w-10 h-10 rounded-full shadow border border-white outline outline-primary/[0.2] outline-offset-2" />
           </Link>
         ) : (
-        <Button variant="secondary" href="/auth/login">Login</Button>
+        <Button variant="secondary" href="/auth/login" className="rounded-full">Login</Button>
         )}
       </header>
 
