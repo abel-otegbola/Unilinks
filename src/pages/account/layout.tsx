@@ -2,7 +2,7 @@ import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
 import Dashboard from "./dashboard";
-import { ListIcon } from "@phosphor-icons/react";
+import { GearIcon, ListIcon, SignOutIcon, UserIcon } from "@phosphor-icons/react";
 import Sidebar from "../../components/sidebar/Sidebar";
 import PaymentMethodsPage from "./payment-methods";
 import PaymentLinks from "./links";
@@ -78,7 +78,7 @@ function AccountLayout() {
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                   >
-                    <span>⚙️</span>
+                    <span><GearIcon size={16} /></span>
                     Settings
                   </button>
                   <button
@@ -88,7 +88,7 @@ function AccountLayout() {
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                   >
-                    <span>👤</span>
+                    <span><UserIcon size={16} /></span>
                     Profile
                   </button>
                   <hr className="my-1 border-gray-200" />
@@ -96,7 +96,7 @@ function AccountLayout() {
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                   >
-                    <span>🚪</span>
+                    <span><SignOutIcon size={16} /></span>
                     Logout
                   </button>
                 </div>
