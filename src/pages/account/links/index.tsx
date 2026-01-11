@@ -9,6 +9,7 @@ import { formatDate } from "../../../utils/helpers/formatDate";
 import { getStatusColor } from "../../../utils/helpers/getStatusColor";
 import { copyToClipboard } from "../../../utils/helpers/copyToClipboard";
 import ShowLinkDetailsModal from "../../../components/modal/showLinkDetailsModal";
+import { Link } from "react-router-dom";
 
 function PaymentLinks() {
   const { 
@@ -148,7 +149,7 @@ function PaymentLinks() {
                   <tr key={link.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-900">{link.reference}</span>
+                        <Link to={`/account/payment-links/${link.id}`} className="text-sm font-medium text-gray-900">{link.reference}</Link>
                         <button
                           onClick={() => copyToClipboard(link.link)}
                           className="text-gray-400 hover:text-gray-600"
@@ -158,20 +159,20 @@ function PaymentLinks() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-semibold text-gray-900">
+                      <Link to={`/account/payment-links/${link.id}`} className="text-sm font-semibold text-gray-900">
                         {formatCurrency(link.amount, link.currency)}
-                      </span>
+                      </Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(link.status)}`}>
+                      <Link to={`/account/payment-links/${link.id}`} className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(link.status)}`}>
                         {link.status}
-                      </span>
+                      </Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {formatDate(link.createdAt)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {formatDate(link.expiresAt)}
+                      <Link to={`/account/payment-links/${link.id}`}>{formatDate(link.expiresAt)}</Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">

@@ -36,19 +36,11 @@ const PaymentProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [popup, setPopup] = useState({ type: "", msg: "", timestamp: 0 });
 
-  // Real-time listener for payment methods - automatically loads on mount
+  
   useEffect(() => {
-    if (!user?.email) {
-      setPaymentMethods([]);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-
     const q = query(
       collection(db, "payment_methods"),
-      where("userId", "==", user.email),
+      where("userId", "==", user?.email || ""),
       orderBy("createdAt", "desc")
     );
 

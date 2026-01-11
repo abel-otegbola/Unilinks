@@ -95,6 +95,7 @@ const PaymentLinkProvider = ({ children }: { children: ReactNode }) => {
     );
 
     return () => unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   // Create a new payment link

@@ -93,10 +93,10 @@ function Dashboard() {
                                   
                                   <tr key={link.id} className="border border-gray-500/[0.1] rounded-lg">
                                     <td className="py-4 whitespace-nowrap">
-                                      <Link to={`/account/payment-links/${link.id}`} key={link.id}>{link.reference}</Link>
+                                      <Link to={`/account/payment-links/${link.id}`}>{link.reference}</Link>
                                     </td>
                                     <td className="py-4 whitespace-nowrap">
-                                      <Link to={`/account/payment-links/${link.id}`} key={link.id}>{link.currency}{link.amount}</Link>
+                                      <Link to={`/account/payment-links/${link.id}`}>{link.currency}{link.amount}</Link>
                                     </td>
                                     <td className="py-4 whitespace-nowrap"><p className={`w-fit rounded-full px-2 py-1 ${getStatusColor(link.status)}`}>{link.status}</p></td>
                                   </tr>
