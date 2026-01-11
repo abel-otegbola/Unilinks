@@ -1,16 +1,16 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import Modal from "./Modal";
 import Input from "../input/input";
 import Dropdown from "../dropdown/dropdown";
 import Button from "../button/Button";
 import { PaymentLinkContext } from "../../contexts/PaymentLinkContext";
 import { PaymentContext } from "../../contexts/PaymentContext";
-import type { PaymentLinkInput } from "../../interface/payments";
-import { AuthContext } from "../../contexts/AuthContext";
+import type { PaymentLink } from "../../interface/payments";
 
-interface AddPaymentLinkModalProps {
+interface EditPaymentLinkModalProps {
   isOpen: boolean;
   onClose: () => void;
+  paymentLink: PaymentLink | null;
 }
 
 const currencyOptions = [
@@ -23,11 +23,10 @@ const currencyOptions = [
   { id: "JPY", title: "JPY" },
 ];
 
-export default function AddPaymentLinkModal({ isOpen, onClose }: AddPaymentLinkModalProps) {
-  const { createPaymentLink } = useContext(PaymentLinkContext);
+export default function EditPaymentLinkModal({ isOpen, onClose, paymentLink }: EditPaymentLinkModalProps) {
+  const { updatePaymentLink } = useContext(PaymentLinkContext);
   const { paymentMethods } = useContext(PaymentContext);
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useContext(AuthContext);
   
   const [formData, setFormData] = useState({
     amount: "",
@@ -39,13 +38,29 @@ export default function AddPaymentLinkModal({ isOpen, onClose }: AddPaymentLinkM
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
+  // Load payment link data when modal opens
+  useEffect(() => {
+    if (paymentLink) {
+      const expiresAtDate = new Date(paymentLink.expiresAt);
+      const formattedDate = expiresAtDate.toISOString().slice(0, 16);
+      
+      setFormData({
+        amount: paymentLink.amount.toString(),
+        currency: paymentLink.currency,
+        expiresAt: formattedDate,
+        notes: paymentLink.notes || "",
+        paymentMethodIds: paymentLink.paymentMethodIds || [],
+      });
+    }
+  }, [paymentLink, isOpen]);
+
   const resetForm = () => {
     setFormData({
       amount: "",
       currency: "USD",
-      paymentMethodIds: [],
       expiresAt: "",
       notes: "",
+      paymentMethodIds: [],
     });
     setErrors({});
   };
@@ -60,9 +75,11 @@ export default function AddPaymentLinkModal({ isOpen, onClose }: AddPaymentLinkM
     if (!formData.currency) {
       newErrors.currency = "Currency is required";
     }
+
     if (!formData.paymentMethodIds || formData.paymentMethodIds.length === 0) {
       newErrors.paymentMethodIds = "At least one payment method is required";
     }
+
     if (!formData.expiresAt) {
       newErrors.expiresAt = "Expiration date is required";
     } else {
@@ -80,25 +97,23 @@ export default function AddPaymentLinkModal({ isOpen, onClose }: AddPaymentLinkM
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) return;
+    if (!validateForm() || !paymentLink?.id) return;
 
     setIsLoading(true);
 
     try {
-      const paymentLinkData: PaymentLinkInput = {
-        paymentMethodIds: formData.paymentMethodIds,
+      await updatePaymentLink(paymentLink.id, {
         amount: parseFloat(formData.amount),
         currency: formData.currency,
         expiresAt: new Date(formData.expiresAt),
         notes: formData.notes,
-        userId: user?.email || "unknown",
-      };
-
-      await createPaymentLink(paymentLinkData);
+        paymentMethodIds: formData.paymentMethodIds,
+        userId: paymentLink.userId,
+      });
       resetForm();
       onClose();
     } catch (error) {
-      console.error("Error creating payment link:", error);
+      console.error("Error updating payment link:", error);
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +125,7 @@ export default function AddPaymentLinkModal({ isOpen, onClose }: AddPaymentLinkM
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Create Payment Link" size="md">
+    <Modal isOpen={isOpen} onClose={handleClose} title="Edit Payment Link" size="md">
       <form onSubmit={handleSubmit} className="space-y-4">
         <h3 className="md:text-[18px] text-[16px] font-medium">Link Details</h3>
         
@@ -207,13 +222,20 @@ export default function AddPaymentLinkModal({ isOpen, onClose }: AddPaymentLinkM
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3 pb-4">
+        <div className="flex gap-3 pt-4">
+          <Button
+            type="button"
+            onClick={handleClose}
+            className="flex-1 bg-gray-200 text-gray-700 hover:bg-gray-300"
+          >
+            Cancel
+          </Button>
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-primary text-white hover:bg-primary/90 disabled:opacity-50"
+            className="flex-1 bg-primary text-white hover:bg-primary/90 disabled:opacity-50"
           >
-            {isLoading ? "Creating..." : "Create Link"}
+            {isLoading ? "Updating..." : "Update Link"}
           </Button>
         </div>
       </form>

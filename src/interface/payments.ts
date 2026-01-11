@@ -31,6 +31,7 @@ export interface PaymentLink {
   expiresAt: Date;
   reference: string;
   notes?: string;
+  paymentMethodIds?: string[];
   timeline: TimelineEvent[];
 }
 
@@ -40,6 +41,7 @@ export interface PaymentLinkInput {
   expiresAt: Date;
   notes?: string;
   userId: string;
+  paymentMethodIds?: string[];
 }
 
 export interface TimelineEvent {

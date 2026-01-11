@@ -118,6 +118,7 @@ const PaymentLinkProvider = ({ children }: { children: ReactNode }) => {
         expiresAt: Timestamp.fromDate(data.expiresAt),
         reference,
         notes: data.notes || '',
+        paymentMethodIds: data.paymentMethodIds || [],
         timeline: [createdEvent],
       };
 
@@ -158,6 +159,7 @@ const PaymentLinkProvider = ({ children }: { children: ReactNode }) => {
       if (data.currency !== undefined) updateData.currency = data.currency;
       if (data.expiresAt !== undefined) updateData.expiresAt = Timestamp.fromDate(data.expiresAt);
       if (data.notes !== undefined) updateData.notes = data.notes;
+      if (data.paymentMethodIds !== undefined) updateData.paymentMethodIds = data.paymentMethodIds;
 
       await updateDoc(paymentLinkRef, updateData);
 

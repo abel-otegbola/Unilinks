@@ -3,6 +3,7 @@ import { PencilIcon, TrashIcon, CopyIcon, EyeIcon, PlusCircleIcon } from "@phosp
 import { PaymentLinkContext } from "../../../contexts/PaymentLinkContext";
 import type { PaymentLink } from "../../../interface/payments";
 import AddPaymentLinkModal from "../../../components/modal/AddPaymentLinkModal";
+import EditPaymentLinkModal from "../../../components/modal/EditPaymentLinkModal";
 import { formatCurrency } from "../../../utils/helpers/formatCurrency";
 import { formatDate } from "../../../utils/helpers/formatDate";
 import { getStatusColor } from "../../../utils/helpers/getStatusColor";
@@ -19,6 +20,8 @@ function PaymentLinks() {
   const [selectedLink, setSelectedLink] = useState<PaymentLink | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingLink, setEditingLink] = useState<PaymentLink | null>(null);
 
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this payment link?")) {
@@ -33,6 +36,11 @@ function PaymentLinks() {
   const viewDetails = (link: PaymentLink) => {
     setSelectedLink(link);
     setShowDetailsModal(true);
+  };    
+
+  const handleEdit = (link: PaymentLink) => {
+    setEditingLink(link);
+    setShowEditModal(true);
   };
 
   if (loading) {
@@ -62,6 +70,16 @@ function PaymentLinks() {
         </button>
       </div>
 
+
+      {/* Edit Payment Link Modal */}
+      <EditPaymentLinkModal 
+        isOpen={showEditModal} 
+        onClose={() => {
+          setShowEditModal(false);
+          setEditingLink(null);
+        }}
+        paymentLink={editingLink}
+      />
       {/* Add Payment Link Modal */}
       <AddPaymentLinkModal 
         isOpen={showAddModal} 
@@ -167,6 +185,7 @@ function PaymentLinks() {
                         <button
                           className="text-gray-600 hover:text-gray-900"
                           title="Edit"
+                            onClick={() => handleEdit(link)}
                         >
                           <PencilIcon size={18} />
                         </button>

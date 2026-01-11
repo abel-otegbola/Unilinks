@@ -51,7 +51,7 @@ export default function Dropdown({ className, disabled, label, name, options, va
                 >
                   {
                     options?.map(option => (
-                      <option className="p-4 h-[40px] bg-white" key={option.id} value={option.title}>{option.title}</option>
+                      <option className="p-4 h-[40px] bg-white" key={option.id} value={option.id}>{option.title}</option>
                     ))
                   }
                 </select>

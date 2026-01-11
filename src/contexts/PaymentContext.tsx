@@ -1,4 +1,4 @@
-import { createContext, useState, type ReactNode, useContext } from "react";
+import { createContext, useState, type ReactNode, useContext, useEffect } from "react";
 import { 
   collection, 
   addDoc, 
@@ -33,18 +33,22 @@ export { PaymentContext };
 const PaymentProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useContext(AuthContext);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-  const [loading, setLoading] = useState(!user?.id ? false : true);
+  const [loading, setLoading] = useState(true);
   const [popup, setPopup] = useState({ type: "", msg: "", timestamp: 0 });
 
-  // Real-time listener for payment methods
-  const getUserPaymentMethods = () => {
+  // Real-time listener for payment methods - automatically loads on mount
+  useEffect(() => {
     if (!user?.email) {
+      setPaymentMethods([]);
+      setLoading(false);
       return;
     }
 
+    setLoading(true);
+
     const q = query(
       collection(db, "payment_methods"),
-      where("userId", "==", user?.email),
+      where("userId", "==", user.email),
       orderBy("createdAt", "desc")
     );
 
@@ -78,6 +82,12 @@ const PaymentProvider = ({ children }: { children: ReactNode }) => {
     );
 
     return () => unsubscribe();
+  }, [user?.email]);
+
+  // Legacy function - keeping for backward compatibility
+  const getUserPaymentMethods = () => {
+    // Now handled automatically by useEffect above
+    console.log("getUserPaymentMethods called - now handled automatically");
   };
 
   // Create a new payment method
