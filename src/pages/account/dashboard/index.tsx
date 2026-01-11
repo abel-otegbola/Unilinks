@@ -21,7 +21,7 @@ function Dashboard() {
     <div>
         <div className="flex flex-col bg-white gap-6 min-h-[calc(100vh-80px)] w-full  ">
             <div className="flex flex-col gap-4">
-                <h1 className="md:text-[18px] text-[16px] font-semibolds capitalize leading-[28px]">Overview</h1>
+                <h1 className="md:text-[18px] text-[16px] font-semibold capitalize leading-[28px]">Overview</h1>
 
                 <div className="grid md:grid-cols-4 grid-cols-2 border border-gray-500/[0.1] bg-gray-50 gap-1 rounded-lg p-1">
                   <div className="flex flex-col gap-2 md:md:py-6 p-4 rounded border border-gray-500/[0.1] bg-white">
