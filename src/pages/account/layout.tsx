@@ -6,6 +6,7 @@ import { GearIcon, ListIcon, SignOutIcon, UserIcon } from "@phosphor-icons/react
 import Sidebar from "../../components/sidebar/Sidebar";
 import PaymentMethodsPage from "./payment-methods";
 import PaymentLinks from "./links";
+import SingleLinkPage from "./singleLink";
 
 function AccountLayout() {
   const { user, logout } = useContext(AuthContext);
@@ -22,6 +23,11 @@ function AccountLayout() {
       console.error("Logout error:", error);
     }
   };
+
+  if (!user) {
+    navigate("/login");
+    return null;
+  }
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -111,6 +117,7 @@ function AccountLayout() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/payment-methods" element={<PaymentMethodsPage />} />
             <Route path="/payment-links" element={<PaymentLinks />} />
+            <Route path="/payment-links/:id" element={<SingleLinkPage />} />
             {/* Add more routes as needed */}
           </Routes>
         </main>

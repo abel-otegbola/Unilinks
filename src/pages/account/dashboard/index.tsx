@@ -2,6 +2,7 @@ import { useContext, useEffect } from "react";
 import { PaymentContext } from "../../../contexts/PaymentContext";
 import { PaymentLinkContext } from "../../../contexts/PaymentLinkContext";
 import { getStatusColor } from "../../../utils/helpers/getStatusColor";
+import { Link } from "react-router-dom";
 
 function Dashboard() {
   const { 
@@ -89,9 +90,14 @@ function Dashboard() {
                             <tbody className="bg-white divide-y divide-gray-200">
                               {
                                 paymentLinks.slice(0, 5).map((link) => (
+                                  
                                   <tr key={link.id} className="border border-gray-500/[0.1] rounded-lg">
-                                    <td className="py-4 whitespace-nowrap">{link.reference}</td>
-                                    <td className="py-4 whitespace-nowrap">{link.currency}{link.amount}</td>
+                                    <td className="py-4 whitespace-nowrap">
+                                      <Link to={`/account/payment-links/${link.id}`} key={link.id}>{link.reference}</Link>
+                                    </td>
+                                    <td className="py-4 whitespace-nowrap">
+                                      <Link to={`/account/payment-links/${link.id}`} key={link.id}>{link.currency}{link.amount}</Link>
+                                    </td>
                                     <td className="py-4 whitespace-nowrap"><p className={`w-fit rounded-full px-2 py-1 ${getStatusColor(link.status)}`}>{link.status}</p></td>
                                   </tr>
                                 ))
@@ -106,7 +112,7 @@ function Dashboard() {
                   <div className="flex flex-col gap-4">
                     <h2 className="font-semibold">Payment Methods</h2>
                     <div className="flex flex-col gap-2 border border-gray-500/[0.1] bg-gray-50 gap-1 rounded-lg p-1">
-                      <div className="flex flex-col gap-2 w-full">
+                      <div className="flex flex-col gap-1 w-full">
                           {
                           paymentMethods.length === 0 ? (
                           <p>You have not created any payment links yet.</p>
@@ -114,7 +120,6 @@ function Dashboard() {
                           paymentMethods.map((method, index) => (
                               <div key={index} className="bg-white flex items-center justify-between gap-2 p-4 border border-gray-500/[0.2] rounded-[8px] hover:shadow-sm hover:border-gray-500/40 transition">
                               <p>{method.name}</p>
-                              
                               </div>
                           ))
                           )}
