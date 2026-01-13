@@ -54,7 +54,7 @@ function SettingsPage() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-500/[0.1]">
-        <h1 className="text-2xl font-semibold">Settings</h1>
+        <h1 className="text-lg font-semibold">Settings</h1>
       </div>
 
       <div className="space-y-6">

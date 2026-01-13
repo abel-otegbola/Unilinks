@@ -9,6 +9,7 @@ import PaymentLinks from "./links";
 import SingleLinkPage from "./singleLink";
 import ProfilePage from "./profile";
 import SettingsPage from "./settings";
+import { useOutsideClick } from "../../customHooks/useOutsideClick";
 
 function AccountLayout() {
   const { user, logout } = useContext(AuthContext);
@@ -25,6 +26,8 @@ function AccountLayout() {
       console.error("Logout error:", error);
     }
   };
+
+  const dropdownRef = useOutsideClick(setIsProfileMenuOpen, false)
 
   if (!user) {
     navigate("/auth/login");
@@ -64,7 +67,7 @@ function AccountLayout() {
             </button>
 
             {/* Profile Menu */}
-            <div className="relative">
+            <div className="relative" ref={dropdownRef} >
               <button
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                 className="flex items-center gap-2 hover:bg-gray-50 rounded-lg p-2 transition-colors"
