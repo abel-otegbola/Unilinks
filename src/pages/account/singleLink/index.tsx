@@ -2,6 +2,7 @@ import { CardsIcon } from "@phosphor-icons/react";
 import { useContext, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { PaymentLinkContext } from "../../../contexts/PaymentLinkContext";
+import { PaymentContext } from "../../../contexts/PaymentContext";
 import { copyToClipboard } from "../../../utils/helpers/copyToClipboard";
 import Button from "../../../components/button/Button";
 import Input from "../../../components/input/input";
@@ -12,7 +13,16 @@ import { formatDate } from "../../../utils/helpers/formatDate";
 function SingleLinkPage() {
     const { id } = useParams<{ id: string }>();
     const { getPaymentLinkById } = useContext(PaymentLinkContext);
+    const { paymentMethods } = useContext(PaymentContext);
     const paymentLink = useMemo(() => getPaymentLinkById(id || ""), [id, getPaymentLinkById]);
+
+    // Get payment methods for this link
+    const linkPaymentMethods = useMemo(() => {
+        if (!paymentLink?.paymentMethodIds) return [];
+        return paymentMethods.filter(method => 
+            paymentLink.paymentMethodIds?.includes(method.id || "")
+        );
+    }, [paymentLink, paymentMethods]);
 
     if (!paymentLink) {
         return (
@@ -92,26 +102,53 @@ function SingleLinkPage() {
                 )}
             </div>
 
-            <div className="flex-1 fex flex-col gap-8 border border-gray-500/[0.1] rounded-lg p-4">
-                <p className="font-semibold mb-2 border-b border-gray-500/[0.1] pb-2">Timeline</p>
-                <div className="py-4">
-                <div className="space-y-3">
-                  {paymentLink.timeline.map((event, index) => (
-                    <div key={index} className="flex gap-3">
-                      <div className="flex flex-col items-center">
-                        <div className="w-4 h-4 rounded-full bg-primary"></div>
-                        {index < paymentLink.timeline.length - 1 && (
-                          <div className="w-0.5 h-full bg-gray-200 mt-1"></div>
-                        )}
-                      </div>
-                      <div className="flex-1 pb-4">
-                        <p className="text-sm font-medium text-gray-900">{event.title}</p>
-                        <p className="text-xs text-gray-500 mt-1">{event.date}</p>
-                      </div>
+            <div className="flex-1 flex flex-col gap-8">
+                {/* Timeline Box */}
+                <div className="border border-gray-500/[0.1] rounded-lg p-4">
+                    <p className="font-semibold mb-2 border-b border-gray-500/[0.1] pb-2">Timeline</p>
+                    <div className="py-4">
+                        <div className="space-y-3">
+                            {paymentLink.timeline.map((event, index) => (
+                                <div key={index} className="flex gap-3">
+                                    <div className="flex flex-col items-center">
+                                        <div className="w-4 h-4 rounded-full bg-primary"></div>
+                                        {index < paymentLink.timeline.length - 1 && (
+                                            <div className="w-0.5 h-full bg-gray-200 mt-1"></div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 pb-4">
+                                        <p className="text-sm font-medium text-gray-900">{event.title}</p>
+                                        <p className="text-xs text-gray-500 mt-1">{event.date}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                  ))}
                 </div>
-              </div>
+
+                {/* Payment Methods Box */}
+                <div className="border border-gray-500/[0.1] rounded-lg p-4">
+                    <p className="font-semibold mb-2 border-b border-gray-500/[0.1] pb-2">Payment Methods</p>
+                    <div className="py-4">
+                        <div className="space-y-3">
+                            {linkPaymentMethods.length > 0 ? (
+                                linkPaymentMethods.map((method, index) => (
+                                    <div key={method.id || index} className="flex flex-col gap-1 p-3 bg-gray-50 rounded-lg border border-gray-500/[0.1]">
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-sm font-medium text-gray-900">{method.name}</p>
+                                            <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(method.status)}`}>
+                                                {method.status}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-gray-500 capitalize">{method.type}</p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-sm text-gray-500 text-center py-4">No payment methods added</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     )

@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import Homepage from "./pages/static/home"
+import PaymentPage from "./pages/static/pay"
 import AuthProvider from "./contexts/AuthContext"
 import AuthLayout from "./pages/auth/layout"
 import AccountLayout from "./pages/account/layout"
@@ -16,6 +17,7 @@ function App() {
         <PaymentProvider>
           <Routes>
             <Route path="/" element={<Homepage />} />
+            <Route path="/pay/:reference" element={<PaymentPage />} />
             <Route path="/auth/*" element={<AuthLayout />} />
             <Route path="/account/*" element={<AccountLayout />} />
           </Routes>
