@@ -1,6 +1,5 @@
 import { createContext, useState, useEffect, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLocalStorage } from "../customHooks/useLocaStorage";
 import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, GithubAuthProvider, onAuthStateChanged } from "firebase/auth";
 import { app } from "../firebase/firebase";
 import type { IUser } from "../interface/Auth";
@@ -28,13 +27,7 @@ const AuthProvider = ({ children }: { children: ReactNode}) => {
 
   // Listen to Firebase auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      console.log('Auth state changed:', firebaseUser ? {
-        uid: firebaseUser.uid,
-        email: firebaseUser.email,
-        displayName: firebaseUser.displayName
-      } : 'Not authenticated');
-      
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {      
       if (firebaseUser) {
         const userData: IUser = {
           id: firebaseUser.uid,
@@ -56,6 +49,7 @@ const AuthProvider = ({ children }: { children: ReactNode}) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       // onAuthStateChanged will handle setting the user
+      console.log(remember)
       
       setPopup({ 
         type: "success", 
