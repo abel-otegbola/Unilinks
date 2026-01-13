@@ -198,7 +198,7 @@ function SingleLinkPage() {
                                                 {upload.fileName}
                                             </p>
                                             <p className="text-xs text-gray-500 mt-1">
-                                                Uploaded {formatDate(upload.uploadedAt instanceof Date ? upload.uploadedAt : (upload.uploadedAt as any).toDate())}
+                                                Uploaded {formatDate(upload.uploadedAt instanceof Date ? upload.uploadedAt : (upload.uploadedAt as unknown as { toDate: () => Date }).toDate())}
                                             </p>
                                             {upload.uploadedBy && (
                                                 <p className="text-xs text-gray-500">

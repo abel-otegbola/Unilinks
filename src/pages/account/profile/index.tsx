@@ -11,6 +11,7 @@ import Modal from "../../../components/modal/Modal";
 import { PencilIcon, TrashIcon, UserCircleIcon, EnvelopeIcon, WarningIcon } from "@phosphor-icons/react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { getProfileUpdateErrorMessage, getAccountDeletionErrorMessage } from "../../../utils/helpers/firebaseErrorHandler";
 
 const profileSchema = Yup.object().shape({
   displayName: Yup.string().required("Name is required").min(2, "Name must be at least 2 characters"),
@@ -73,18 +74,7 @@ function ProfilePage() {
         window.location.reload();
       } catch (error: unknown) {
         console.error("Error updating profile:", error);
-        let errorMessage = "Failed to update profile";
-        
-        if (error && typeof error === "object" && "code" in error) {
-          if (error.code === "auth/requires-recent-login") {
-            errorMessage = "Please log out and log back in to update your email";
-          } else if (error.code === "auth/email-already-in-use") {
-            errorMessage = "This email is already in use";
-          } else if (error.code === "auth/invalid-email") {
-            errorMessage = "Invalid email address";
-          }
-        }
-        
+        const errorMessage = getProfileUpdateErrorMessage(error);
         alert(errorMessage);
       }
     },
@@ -141,18 +131,7 @@ function ProfilePage() {
         await logout();
       } catch (error: unknown) {
         console.error("Error deleting account:", error);
-        let errorMessage = "Failed to delete account";
-
-        if (error && typeof error === "object" && "code" in error) {
-          if (error.code === "auth/wrong-password") {
-            errorMessage = "Incorrect password";
-          } else if (error.code === "auth/too-many-requests") {
-            errorMessage = "Too many attempts. Please try again later";
-          } else if (error.code === "auth/requires-recent-login") {
-            errorMessage = "Please log out and log back in before deleting your account";
-          }
-        }
-
+        const errorMessage = getAccountDeletionErrorMessage(error);
         setDeleteError(errorMessage);
       } finally {
         setIsDeleting(false);

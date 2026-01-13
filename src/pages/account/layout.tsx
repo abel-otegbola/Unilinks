@@ -8,6 +8,7 @@ import PaymentMethodsPage from "./payment-methods";
 import PaymentLinks from "./links";
 import SingleLinkPage from "./singleLink";
 import ProfilePage from "./profile";
+import SettingsPage from "./settings";
 
 function AccountLayout() {
   const { user, logout } = useContext(AuthContext);
@@ -120,6 +121,7 @@ function AccountLayout() {
             <Route path="/payment-links" element={<PaymentLinks />} />
             <Route path="/payment-links/:id" element={<SingleLinkPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             {/* Add more routes as needed */}
           </Routes>
         </main>
