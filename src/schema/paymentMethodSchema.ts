@@ -1,0 +1,147 @@
+import * as Yup from "yup";
+
+// Base schema for common fields
+const basePaymentMethodSchema = {
+  methodName: Yup.string()
+    .required("Payment method name is required")
+    .trim()
+    .min(2, "Name must be at least 2 characters"),
+  
+  paymentType: Yup.string()
+    .required("Payment type is required")
+    .oneOf(["bank", "crypto", "paypal", "stripe", "other"], "Invalid payment type"),
+};
+
+// Bank-specific schema
+export const bankPaymentMethodSchema = Yup.object().shape({
+  ...basePaymentMethodSchema,
+  paymentType: Yup.string().equals(["bank"]),
+  bankName: Yup.string()
+    .required("Bank name is required")
+    .trim(),
+  accountNumber: Yup.string()
+    .required("Account number is required")
+    .trim(),
+  accountHolderName: Yup.string()
+    .required("Account holder name is required")
+    .trim(),
+  swiftCode: Yup.string().optional(),
+  routingNumber: Yup.string().optional(),
+});
+
+// Crypto-specific schema
+export const cryptoPaymentMethodSchema = Yup.object().shape({
+  ...basePaymentMethodSchema,
+  paymentType: Yup.string().equals(["crypto"]),
+  walletAddress: Yup.string()
+    .required("Wallet address is required")
+    .trim()
+    .min(26, "Invalid wallet address"),
+  cryptoNetwork: Yup.string()
+    .required("Network is required")
+    .oneOf(["mainnet", "testnet", "polygon", "bsc", "arbitrum"], "Invalid network"),
+  cryptoType: Yup.string()
+    .required("Cryptocurrency type is required")
+    .oneOf(["BTC", "ETH", "USDT", "USDC", "BNB", "SOL", "OTHER"], "Invalid cryptocurrency"),
+});
+
+// PayPal-specific schema
+export const paypalPaymentMethodSchema = Yup.object().shape({
+  ...basePaymentMethodSchema,
+  paymentType: Yup.string().equals(["paypal"]),
+  paypalEmail: Yup.string()
+    .required("PayPal email is required")
+    .email("Invalid email format")
+    .trim(),
+});
+
+// Stripe-specific schema
+export const stripePaymentMethodSchema = Yup.object().shape({
+  ...basePaymentMethodSchema,
+  paymentType: Yup.string().equals(["stripe"]),
+  stripeAccountId: Yup.string()
+    .required("Stripe account ID is required")
+    .trim()
+    .matches(/^acct_/, "Invalid Stripe account ID format"),
+});
+
+// Other-specific schema
+export const otherPaymentMethodSchema = Yup.object().shape({
+  ...basePaymentMethodSchema,
+  paymentType: Yup.string().equals(["other"]),
+  otherDetails: Yup.string()
+    .required("Payment details are required")
+    .trim()
+    .min(5, "Details must be at least 5 characters"),
+});
+
+// Dynamic schema that validates based on payment type
+export const paymentMethodSchema = Yup.object().shape({
+  methodName: Yup.string()
+    .required("Payment method name is required")
+    .trim()
+    .min(2, "Name must be at least 2 characters"),
+  
+  paymentType: Yup.string()
+    .required("Payment type is required")
+    .oneOf(["bank", "crypto", "paypal", "stripe", "other"], "Invalid payment type"),
+  
+  // Bank fields
+  bankName: Yup.string().when("paymentType", {
+    is: "bank",
+    then: (schema) => schema.required("Bank name is required").trim(),
+    otherwise: (schema) => schema.optional(),
+  }),
+  accountNumber: Yup.string().when("paymentType", {
+    is: "bank",
+    then: (schema) => schema.required("Account number is required").trim(),
+    otherwise: (schema) => schema.optional(),
+  }),
+  accountHolderName: Yup.string().when("paymentType", {
+    is: "bank",
+    then: (schema) => schema.required("Account holder name is required").trim(),
+    otherwise: (schema) => schema.optional(),
+  }),
+  swiftCode: Yup.string().optional(),
+  routingNumber: Yup.string().optional(),
+  
+  // Crypto fields
+  walletAddress: Yup.string().when("paymentType", {
+    is: "crypto",
+    then: (schema) => schema.required("Wallet address is required").trim().min(26, "Invalid wallet address"),
+    otherwise: (schema) => schema.optional(),
+  }),
+  cryptoNetwork: Yup.string().when("paymentType", {
+    is: "crypto",
+    then: (schema) => schema.required("Network is required"),
+    otherwise: (schema) => schema.optional(),
+  }),
+  cryptoType: Yup.string().when("paymentType", {
+    is: "crypto",
+    then: (schema) => schema.required("Cryptocurrency type is required"),
+    otherwise: (schema) => schema.optional(),
+  }),
+  
+  // PayPal fields
+  paypalEmail: Yup.string().when("paymentType", {
+    is: "paypal",
+    then: (schema) => schema.required("PayPal email is required").email("Invalid email format").trim(),
+    otherwise: (schema) => schema.optional(),
+  }),
+  
+  // Stripe fields
+  stripeAccountId: Yup.string().when("paymentType", {
+    is: "stripe",
+    then: (schema) => schema.required("Stripe account ID is required").trim(),
+    otherwise: (schema) => schema.optional(),
+  }),
+  
+  // Other fields
+  otherDetails: Yup.string().when("paymentType", {
+    is: "other",
+    then: (schema) => schema.required("Payment details are required").trim().min(5, "Details must be at least 5 characters"),
+    otherwise: (schema) => schema.optional(),
+  }),
+});
+
+export type PaymentMethodFormValues = Yup.InferType<typeof paymentMethodSchema>;
