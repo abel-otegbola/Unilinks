@@ -3,13 +3,14 @@ import Button from "../../../components/button/Button";
 import { useContext } from "react";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { Link } from "react-router-dom";
+import Footer from "../../../components/footer/Footer";
 
 export default function Homepage() {
   const { user } = useContext(AuthContext);
 
   return (
     <main className="bg-[url('/bg.svg')] bg-cover bg-top min-h-screen flex flex-col">
-      <header className="flex justify-between items-center sticky sm:top-4 sm:w-[400px] w-full bg-white/[0.8] backdrop-blur-sm sm:border-2 sm:border-white sm:shadow-sm sm:rounded-[12px] mx-auto sm:py-2 sm:pr-2 p-4 pl-4 sm:mt-4 items-center">
+      <header className="flex justify-between items-center lg:px-[6%] md:px-[3%] p-4">
         <img src="/logo.svg" alt="UniLinks logo" width={64} height={32} className="sm:ml-0 ml-1" />
 
         {user ? (
@@ -23,11 +24,11 @@ export default function Homepage() {
 
       <section className="flex flex-col sm:items-center 2xl:gap-8 md:gap-6 gap-4 2xl:p-12 md:p-10 p-4 py-24">
         <h2 className="md:text-[48px] text-[40px] max-w-2xl leading-[120%] font-semibold sm:text-center">
-          Universal Payment Link Generator
+          Create Payment Links That Convert in Seconds
         </h2>
 
         <p className="sm:text-center max-w-2xl leading-[24px] mb-4">
-          Generate professional payment links in seconds. Set your amount, choose your payment method, and share. Track activity and get paid faster across multiple currencies.
+          The modern payment link generator for freelancers, businesses, and creators. Accept payments via crypto, bank transfer, PayPal, and Stripe with custom branded links. Get paid faster with real-time tracking and instant notifications.
         </p>
 
         <Button className="z-2" href="/auth/login">Get Started for free</Button>
@@ -40,12 +41,12 @@ export default function Homepage() {
       <section className="flex flex-col gap-10 lg:p-[6%] md:p-[3%] p-4 md:mx-[5%] mb-12 md:shadow-lg rounded-[12px] bg-white">
         <div className="grid md:grid-cols-2 items-center gap-[60px]">
           <div className="flex flex-col gap-4">
-            <p className="font-medium text-primary uppercase">Secure payment</p>
-            <h2 className="text-[42px] font-medium leading-[110%]">Experience that grows with your business</h2>
+            <p className="font-medium text-primary uppercase">Enterprise-Grade Security</p>
+            <h2 className="text-[42px] font-medium leading-[110%]">Built to Scale with Your Success</h2>
           </div>
           <div className="flex items-center md:justify-center">
             <p className="md:w-[75%]">
-              Our platform is built with scalability in mind, ensuring that as your business expands, our services adapt to meet your evolving payment needs seamlessly.
+              From solo entrepreneurs to growing enterprises, UniLinks adapts to your payment needs. Our infrastructure handles everything from a single transaction to thousands per day, with bank-level security and 99.9% uptime guaranteed.
             </p>
           </div>
         </div>
@@ -53,45 +54,56 @@ export default function Homepage() {
         <div className="grid md:grid-cols-3 items-center gap-[60px]">
           <div className="flex flex-col gap-4">
             <p className="md:text-[40px] text-[32px] text-primary"><CurrencyCircleDollarIcon /></p>
-            <h2 className="font-medium">Multiple Payment Methods</h2>
-            <p className="">Support for bank transfers, cryptocurrency, PayPal, Stripe, and more. Accept payments through your preferred channels.</p>
+            <h2 className="font-medium">Accept Any Payment Method</h2>
+            <p className="">Never lose a sale again. Support for bank transfers, Bitcoin, Ethereum, PayPal, Stripe, and 5+ payment gateways. Your customers pay how they want, you get paid instantly.</p>
           </div>
           <div className="flex flex-col gap-4">
             <p className="md:text-[40px] text-[32px] text-primary"><ChartLineUpIcon /></p>
-            <h2 className="font-medium">Real-Time Tracking</h2>
-            <p className="">Track payment activity with detailed timelines. Monitor link status, expiration dates, and payment completion in real-time.</p>
+            <h2 className="font-medium">Live Payment Analytics</h2>
+            <p className="">Know exactly when you're getting paid. Monitor every transaction with detailed activity timelines, automatic expiration tracking, and instant payment confirmations delivered to your dashboard.</p>
           </div>
           <div className="flex flex-col gap-4">
             <p className="md:text-[40px] text-[32px] text-primary"><ShareNetworkIcon /></p>
-            <h2 className="font-medium">Easy Sharing</h2>
-            <p className="">Generate unique payment links in seconds. Copy and share via email, social media, or any messaging platform with one click.</p>
+            <h2 className="font-medium">Share Links Anywhere</h2>
+            <p className="">One link, unlimited reach. Generate secure payment URLs in 3 seconds. Share via WhatsApp, email, Instagram, or embed on your website. QR codes included for in-person payments.</p>
           </div>
         </div>
       </section>
 
       <section className="flex flex-col gap-10 lg:p-[6%] md:p-[3%] p-4 mb-12">
           <div className="flex flex-col justify-center md:items-center gap-4 mb-10">
-            <p className="font-medium text-primary uppercase">Why us</p>
-            <h2 className="text-[42px] font-medium leading-[110%]">Why they prefer Unilinks</h2>
+            <p className="font-medium text-primary uppercase">Trusted by Thousands</p>
+            <h2 className="text-[42px] font-medium leading-[110%]">Why Businesses Choose UniLinks</h2>
           </div>
 
           <div className="flex md:flex-nowrap flex-wrap gap-[32px]">
             <div className="flex flex-col md:w-[50%] w-full gap-4 bg-primary/[0.08] rounded-lg p-6">
               <h3 className="font-medium text-[80px] font-semibold">5+</h3>
-              <p>Payment gateways you can choose from</p>
+              <p>Integrated payment gateways including crypto, cards, and bank transfers</p>
             </div>
             <div className="flex flex-col justify-between md:w-[50%] w-full gap-4 bg-primary/[0.08] rounded-lg p-6">
-              <h3 className="font-semibold text-lg">Robust Security</h3>
-              <p>We prioritize your security with advanced encryption and compliance measures to protect your transactions and data.</p>
+              <h3 className="font-semibold text-lg">Bank-Level Security</h3>
+              <p>Your transactions are protected with AES-256 encryption, secure Firebase authentication, and automated fraud detection. We never store sensitive payment credentials.</p>
             </div>
           </div>
           <div className="flex md:flex-nowrap flex-wrap w-full gap-4 bg-primary/[0.08] rounded-lg p-6 h-[400px]">
             <div className="flex flex-col justify-center gap-8 md:w-[30%]">
-              <h3 className="font-semibold text-lg">Real-Time Analytics</h3>
-              <p>Track all your payment links with comprehensive dashboards, activity timelines, and instant notifications for every transaction.</p>
+              <h3 className="font-semibold text-lg">Complete Payment Visibility</h3>
+              <p>Professional dashboard with comprehensive analytics. Track payment status, view transaction history, manage expiration dates, and receive instant notifications the moment you get paid.</p>
             </div>
           </div>
       </section>
+
+      <section className="flex flex-col items-center justify-center gap-10 lg:p-[6%] p-[10%] sm:mx-[6%] mx-4 mb-12 rounded-[12px] bg-primary text-white">
+        <div className="">
+          <h2 className="md:text-[42px] text-[32px] font-medium leading-[110%] text-center">Ready to Get Started?</h2>
+        </div>
+        <div>
+          <Button variant="secondary" className="z-2" href="/auth/login">Create Your Free Account</Button>
+        </div>      
+      </section>
+
+      <Footer />
     </main>
   );
 }
