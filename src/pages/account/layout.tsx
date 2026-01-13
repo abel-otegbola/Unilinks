@@ -7,6 +7,7 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import PaymentMethodsPage from "./payment-methods";
 import PaymentLinks from "./links";
 import SingleLinkPage from "./singleLink";
+import ProfilePage from "./profile";
 
 function AccountLayout() {
   const { user, logout } = useContext(AuthContext);
@@ -118,6 +119,7 @@ function AccountLayout() {
             <Route path="/payment-methods" element={<PaymentMethodsPage />} />
             <Route path="/payment-links" element={<PaymentLinks />} />
             <Route path="/payment-links/:id" element={<SingleLinkPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
             {/* Add more routes as needed */}
           </Routes>
         </main>
