@@ -1,6 +1,8 @@
-import { CardsIcon } from "@phosphor-icons/react";
-import { useContext, useMemo } from "react";
+import { CardsIcon, DownloadSimpleIcon, QrCodeIcon } from "@phosphor-icons/react";
+import { useContext, useMemo, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import QRCode from "qrcode";
+import jsPDF from "jspdf";
 import { PaymentLinkContext } from "../../../contexts/PaymentLinkContext";
 import { PaymentContext } from "../../../contexts/PaymentContext";
 import { copyToClipboard } from "../../../utils/helpers/copyToClipboard";
@@ -15,6 +17,7 @@ function SingleLinkPage() {
     const { getPaymentLinkById } = useContext(PaymentLinkContext);
     const { paymentMethods } = useContext(PaymentContext);
     const paymentLink = useMemo(() => getPaymentLinkById(id || ""), [id, getPaymentLinkById]);
+    const qrCodeCanvasRef = useRef<HTMLCanvasElement>(null);
 
     // Get payment methods for this link
     const linkPaymentMethods = useMemo(() => {
@@ -23,6 +26,87 @@ function SingleLinkPage() {
             paymentLink.paymentMethodIds?.includes(method.id || "")
         );
     }, [paymentLink, paymentMethods]);
+
+    // Generate QR Code
+    useEffect(() => {
+        if (paymentLink && qrCodeCanvasRef.current) {
+            QRCode.toCanvas(
+                qrCodeCanvasRef.current,
+                paymentLink.link,
+                {
+                    width: 200,
+                    margin: 2,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF',
+                    },
+                },
+                (error) => {
+                    if (error) console.error('Error generating QR code:', error);
+                }
+            );
+        }
+    }, [paymentLink]);
+
+    const downloadQRCodeAsPDF = async () => {
+        if (!paymentLink || !qrCodeCanvasRef.current) return;
+
+        try {
+            // Generate QR code as data URL
+            const qrDataUrl = qrCodeCanvasRef.current.toDataURL('image/png');
+
+            // Create PDF
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4',
+            });
+
+            // Add title
+            pdf.setFontSize(20);
+            pdf.text('Payment Link QR Code', 105, 20, { align: 'center' });
+
+            // Add reference
+            pdf.setFontSize(12);
+            pdf.text(`Reference: ${paymentLink.reference}`, 105, 30, { align: 'center' });
+
+            // Add amount
+            pdf.setFontSize(14);
+            pdf.text(
+                `Amount: ${formatCurrency(paymentLink.amount, paymentLink.currency)}`,
+                105,
+                40,
+                { align: 'center' }
+            );
+
+            // Add QR code (centered)
+            const qrSize = 100;
+            const xPos = (210 - qrSize) / 2; // Center on A4 width (210mm)
+            pdf.addImage(qrDataUrl, 'PNG', xPos, 50, qrSize, qrSize);
+
+            // Add link text below QR code
+            pdf.setFontSize(10);
+            pdf.text('Scan to pay or visit:', 105, 160, { align: 'center' });
+            pdf.setFontSize(9);
+            pdf.text(paymentLink.link, 105, 167, { align: 'center' });
+
+            // Add footer
+            pdf.setFontSize(8);
+            pdf.setTextColor(128);
+            pdf.text(
+                `Generated on ${formatDate(new Date())}`,
+                105,
+                280,
+                { align: 'center' }
+            );
+
+            // Save PDF
+            pdf.save(`payment-link-${paymentLink.reference}.pdf`);
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('Failed to generate PDF');
+        }
+    };
 
     if (!paymentLink) {
         return (
@@ -147,6 +231,57 @@ function SingleLinkPage() {
                                 <p className="text-sm text-gray-500 text-center py-4">No payment methods added</p>
                             )}
                         </div>
+                    </div>
+                </div>
+
+                {/* QR Code Box */}
+                <div className="border border-gray-500/[0.1] rounded-lg p-4">
+                    <p className="font-semibold mb-2 border-b border-gray-500/[0.1] pb-2">QR Code</p>
+                    <div className="py-4 flex flex-col items-center gap-4">
+                        {/* Hidden canvas for QR generation */}
+                        <canvas ref={qrCodeCanvasRef} className="hidden" />
+                        
+                        {/* Display QR Code */}
+                        <div className="p-4 bg-white rounded-lg border border-gray-500/[0.2] shadow-sm">
+                            <div className="w-[200px] h-[200px] flex items-center justify-center">
+                                {paymentLink.link ? (
+                                    <canvas
+                                        ref={(canvas) => {
+                                            if (canvas && paymentLink) {
+                                                QRCode.toCanvas(
+                                                    canvas,
+                                                    paymentLink.link,
+                                                    {
+                                                        width: 200,
+                                                        margin: 2,
+                                                        color: {
+                                                            dark: '#000000',
+                                                            light: '#FFFFFF',
+                                                        },
+                                                    }
+                                                );
+                                            }
+                                        }}
+                                    />
+                                ) : (
+                                    <QrCodeIcon size={48} className="text-gray-300" />
+                                )}
+                            </div>
+                        </div>
+
+                        <p className="text-xs text-center text-gray-500">
+                            Scan this code to access the payment link
+                        </p>
+
+                        {/* Download Button */}
+                        <Button
+                            onClick={downloadQRCodeAsPDF}
+                            className="w-full flex items-center justify-center gap-2"
+                            variant="secondary"
+                        >
+                            <DownloadSimpleIcon size={18} />
+                            Download as PDF
+                        </Button>
                     </div>
                 </div>
             </div>
