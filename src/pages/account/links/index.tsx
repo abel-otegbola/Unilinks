@@ -174,22 +174,22 @@ function PaymentLinks() {
                       </Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {formatDate(link.createdAt)}
+                      <Link to={`/account/payment-links/${link.id}`}>{formatDate(link.createdAt)}</Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       <Link to={`/account/payment-links/${link.id}`}>{formatDate(link.expiresAt)}</Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-4">
                         <button
                           onClick={() => viewDetails(link)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="rounded-full border border-gray-500/[0.1] p-1 hover:bg-gray-100 transition"
                           title="View Details"
                         >
                           <EyeIcon size={18} />
                         </button>
                         <button
-                          className="text-gray-600 hover:text-gray-900"
+                          className="rounded-full border border-gray-500/[0.1] p-1 hover:bg-gray-100 transition"
                           title="Edit"
                             onClick={() => handleEdit(link)}
                         >
@@ -197,7 +197,7 @@ function PaymentLinks() {
                         </button>
                         <button
                           onClick={() => handleDelete(link.id!)}
-                          className="text-red-600 hover:text-red-900"
+                          className="rounded-full border border-gray-500/[0.1] p-1 hover:bg-gray-100 transition"
                           title="Delete"
                         >
                           <TrashIcon size={18} />

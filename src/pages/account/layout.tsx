@@ -7,6 +7,7 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import PaymentMethodsPage from "./payment-methods";
 import PaymentLinks from "./links";
 import SingleLinkPage from "./singleLink";
+import SinglePaymentMethodPage from "./singlePaymentMethod";
 import ProfilePage from "./profile";
 import SettingsPage from "./settings";
 import { useOutsideClick } from "../../customHooks/useOutsideClick";
@@ -121,6 +122,7 @@ function AccountLayout() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/payment-methods" element={<PaymentMethodsPage />} />
+            <Route path="/payment-methods/:id" element={<SinglePaymentMethodPage />} />
             <Route path="/payment-links" element={<PaymentLinks />} />
             <Route path="/payment-links/:id" element={<SingleLinkPage />} />
             <Route path="/profile" element={<ProfilePage />} />

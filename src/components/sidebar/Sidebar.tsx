@@ -1,5 +1,5 @@
 import { NavLink, Link } from "react-router-dom";
-import { CirclesFourIcon, GearIcon, LinkSimpleIcon, MoneyIcon, WalletIcon } from "@phosphor-icons/react";
+import { CirclesFourIcon, GearIcon, LinkSimpleIcon, UserIcon, WalletIcon } from "@phosphor-icons/react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -16,8 +16,8 @@ const Sidebar = ({ isOpen, onClose, pathname, user }: SidebarProps) => {
     { name: "Dashboard", path: "/account", icon: <CirclesFourIcon /> },
     { name: "Payment methods", path: "/account/payment-methods", icon: <WalletIcon /> },
     { name: "Payment links", path: "/account/payment-links", icon: <LinkSimpleIcon /> },
-    { name: "Transactions", path: "/account/transactions", icon: <MoneyIcon /> },
     { name: "Settings", path: "/account/settings", icon: <GearIcon /> },
+    { name: "Profile", path: "/account/profile", icon: <UserIcon /> },
   ];
 
   return (

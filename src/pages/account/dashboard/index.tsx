@@ -3,6 +3,7 @@ import { PaymentContext } from "../../../contexts/PaymentContext";
 import { PaymentLinkContext } from "../../../contexts/PaymentLinkContext";
 import { getStatusColor } from "../../../utils/helpers/getStatusColor";
 import { Link } from "react-router-dom";
+import { formatCurrency } from "../../../utils/helpers/formatCurrency";
 
 function Dashboard() {
   const { 
@@ -29,7 +30,7 @@ function Dashboard() {
                     <h2 className="font-semibold">Overall Links</h2>
                     <div className="flex flex-col">
                       <div className="flex gap-2 justify-end flex-wrap flex-col">
-                        <p className="xl:text-5xl md:text-4xl sm:text-3xl text-2xl font-semibold">12</p>
+                        <p className="xl:text-5xl md:text-4xl sm:text-3xl text-2xl font-semibold">{paymentLinks?.length || 0}</p>
                         <p className="border border-green-400 bg-green-400/[0.2] text-green-600 w-fit p-2 py-2 mb-2 leading-0 rounded text-[10px]">+5%</p>
                       </div>
                       <p className="text-sm text-gray-500">Total links created</p>
@@ -40,7 +41,7 @@ function Dashboard() {
                     <h2 className="font-semibold">Active Links</h2>
                     <div className="flex flex-col">
                       <div className="flex gap-2 justify-end flex-wrap flex-col">
-                        <p className="xl:text-5xl md:text-4xl sm:text-3xl text-2xl font-semibold">8</p>
+                        <p className="xl:text-5xl md:text-4xl sm:text-3xl text-2xl font-semibold">{paymentLinks?.filter(l => l.status === 'active').length || 0}</p>
                         <p className="border border-green-400 bg-green-400/[0.2] text-green-600 w-fit p-2 py-2 mb-2 leading-0 rounded text-[10px]">+5%</p>
                       </div>
                       <p className="text-sm text-gray-500">Total active links</p>
@@ -51,7 +52,7 @@ function Dashboard() {
                     <h2 className="font-semibold">Expired Links</h2>
                     <div className="flex flex-col">
                       <div className="flex gap-2 justify-end flex-wrap flex-col">
-                        <p className="xl:text-5xl md:text-4xl sm:text-3xl text-2xl font-semibold">4</p>
+                        <p className="xl:text-5xl md:text-4xl sm:text-3xl text-2xl font-semibold">{paymentLinks?.filter(l => l.status === 'expired').length || 0}</p>
                         <p className="border border-green-400 bg-green-400/[0.2] text-green-600 w-fit p-2 py-2 mb-2 leading-0 rounded text-[10px]">+5%</p>
                       </div>
                       <p className="text-sm text-gray-500">Total expired links</p>
@@ -62,7 +63,7 @@ function Dashboard() {
                     <h2 className="font-semibold">Total Revenue</h2>
                     <div className="flex flex-col">
                       <div className="flex gap-2 justify-end flex-wrap flex-col">
-                        <p className="xl:text-5xl md:text-4xl sm:text-3xl text-2xl font-semibold">$6,450.00</p>
+                        <p className="xl:text-5xl md:text-4xl sm:text-3xl text-2xl font-semibold">{formatCurrency(paymentLinks?.reduce((total, link) => total + link.amount, 0) || 0, "USD")}</p>
                         <p className="border border-green-400 bg-green-400/[0.2] text-green-600 w-fit p-2 py-2 mb-2 leading-0 rounded text-[10px]">+5%</p>
                       </div>
                       <p className="text-sm text-gray-500">Total revenue generated</p>
@@ -79,8 +80,8 @@ function Dashboard() {
                       <p>You have not created any payment links yet.</p>
                       ) : (
                         <div className="overflow-x-auto">
-                          <table className="w-full rounded-lg border border-gray-200 overflow-hidden">
-                            <thead className="bg-gray-50 border border-gray-200">
+                          <table className="w-full overflow-hidden">
+                            <thead className="bg-gray-50 ">
                               <tr className="">
                                 <th className="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
                                 <th className="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
@@ -91,7 +92,7 @@ function Dashboard() {
                               {
                                 paymentLinks.slice(0, 5).map((link) => (
                                   
-                                  <tr key={link.id} className="border border-gray-500/[0.1] rounded-lg">
+                                  <tr key={link.id} className="border-b border-gray-500/[0.1] rounded-lg">
                                     <td className="py-4 whitespace-nowrap">
                                       <Link to={`/account/payment-links/${link.id}`}>{link.reference}</Link>
                                     </td>
@@ -115,12 +116,19 @@ function Dashboard() {
                       <div className="flex flex-col gap-1 w-full">
                           {
                           paymentMethods.length === 0 ? (
-                          <p>You have not created any payment links yet.</p>
+                          <p>You have not created any payment methods yet.</p>
                           ) : (
-                          paymentMethods.map((method, index) => (
-                              <div key={index} className="bg-white flex items-center justify-between gap-2 p-4 border border-gray-500/[0.2] rounded-[8px] hover:shadow-sm hover:border-gray-500/40 transition">
-                              <p>{method.name}</p>
-                              </div>
+                          paymentMethods.map((method) => (
+                              <Link 
+                                key={method.id} 
+                                to={`/account/payment-methods/${method.id}`}
+                                className="bg-white flex items-center justify-between gap-2 p-4 border border-gray-500/[0.2] rounded-[8px] hover:shadow-sm hover:border-gray-500/40 transition cursor-pointer"
+                              >
+                                <p>{method.name}</p>
+                                <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(method.status)}`}>
+                                  {method.status}
+                                </span>
+                              </Link>
                           ))
                           )}
                       </div>

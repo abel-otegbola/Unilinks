@@ -6,6 +6,7 @@ import AddPaymentMethodModal from "../../../components/modal/AddPaymentMethodMod
 import EditPaymentMethodModal from "../../../components/modal/EditPaymentMethodModal";
 import { PencilIcon, PlusCircleIcon, TrashIcon } from "@phosphor-icons/react";
 import { getStatusColor } from "../../../utils/helpers/getStatusColor";
+import { Link } from "react-router-dom";
 
 function PaymentMethodsPage() {
   const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
@@ -79,11 +80,11 @@ function PaymentMethodsPage() {
             {
               paymentMethods.map((method) => (
                 <tr key={method.id} className="border border-gray-500/[0.1] rounded-lg">
-                  <td className="px-6 py-4 whitespace-nowrap">{method.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{method.type}</td>
-                  <td className="px-6 py-4 whitespace-nowrap"><p className={`w-fit rounded-full px-2 py-1 ${getStatusColor(method.status)}`}>{method.status}</p></td>
+                  <td className="px-6 py-4 whitespace-nowrap"><Link to={`/account/payment-methods/${method.id}`}>{method.name}</Link></td>
+                  <td className="px-6 py-4 whitespace-nowrap"><Link to={`/account/payment-methods/${method.id}`}>{method.type}</Link></td>
+                  <td className="px-6 py-4 whitespace-nowrap"><Link to={`/account/payment-methods/${method.id}`}><p className={`w-fit rounded-full px-2 py-1 ${getStatusColor(method.status)}`}>{method.status}</p></Link></td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex gap-2 items-center">
+                    <div className="flex gap-4 items-center">
                       <button
                         onClick={() => openEditModal(method)}
                         className="rounded-full border border-gray-500/[0.1] p-1 hover:bg-gray-100 transition"
