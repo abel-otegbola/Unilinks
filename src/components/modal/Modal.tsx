@@ -42,7 +42,7 @@ export default function Modal({ isOpen, onClose, title, children, size = "md" }:
 
         {/* Body */}
         <div className="p-6 py-3 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 124px)' }}>
-          <div className="h-full ">
+          <div className="h-full mt-4">
             {children}
           </div>
         </div>
