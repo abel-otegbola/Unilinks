@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { PencilIcon, TrashIcon, CopyIcon, EyeIcon, PlusCircleIcon } from "@phosphor-icons/react";
 import { PaymentLinkContext } from "../../../contexts/PaymentLinkContext";
 import type { PaymentLink } from "../../../interface/payments";
@@ -43,6 +43,11 @@ function PaymentLinks() {
     setEditingLink(link);
     setShowEditModal(true);
   };
+  
+  
+    useEffect(() => {
+      console.log("Payment Links:", paymentLinks);
+    }, [paymentLinks]);
 
   if (loading) {
     return (

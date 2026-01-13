@@ -78,6 +78,7 @@ const PaymentLinkProvider = ({ children }: { children: ReactNode }) => {
             reference: data.reference,
             notes: data.notes,
             timeline: data.timeline || [],
+            paymentMethodIds: data.paymentMethodIds || [],
           } as PaymentLink;
         });
         setPaymentLinks(links);

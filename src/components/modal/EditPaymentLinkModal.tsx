@@ -62,10 +62,6 @@ export default function EditPaymentLinkModal({ isOpen, onClose, paymentLink }: E
     },
   });
 
-  useEffect(() => {
-    console.log("Payment Methods:", paymentLink);
-  }, [paymentLink]);
-
   // Load payment link data when modal opens
   useEffect(() => {
     if (paymentLink) {
