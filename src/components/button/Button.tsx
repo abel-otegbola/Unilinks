@@ -28,7 +28,7 @@ export default function Button({ variant, className, href, size, disabled, onCli
                     className={`rounded-[8px] flex items-center justify-center md:gap-2 gap-1 w-fit font-medium cursor-pointer duration-500 
                         ${variants[variant || "primary"]} 
                         ${disabled ? "opacity-[0.25]" : ""} 
-                        ${size === "xs" ? "rounded-[2px] text-[8px] py-[2px] md:px-[8px] px-[4px]" : size === "small" ? "rounded text-[12px] py-[4px] md:px-[12px] px-[8px]" : size === "large" ? "rounded-[8px] md:py-[16px] py-[10px] md:px-[32px] px-[28px]" : "rounded-[8px] md:py-[12px] py-[10px] md:px-[24px] px-[18px]"} 
+                        ${size === "xs" ? "rounded-[2px] text-[8px] py-[2px] md:px-[8px] px-[4px]" : size === "small" ? "rounded-[8px] text-[12px] md:py-[10px] py-[8px] md:px-[18px] px-[12px]" : size === "large" ? "rounded-[8px] text-[12px] md:py-[12px] py-[10px] md:px-[18px] px-[12px]" : "rounded-[8px] md:py-[12px] py-[10px] md:px-[24px] px-[18px]"} 
                         ${className} 
                     `}
                 > 
@@ -39,7 +39,7 @@ export default function Button({ variant, className, href, size, disabled, onCli
                     className={`rounded-[8px] duration-500 flex items-center justify-center md:gap-2 gap-1 w-fit font-medium cursor-pointer duration-500 cursor-pointer
                         ${variants[variant || "primary"]} 
                         ${disabled ? "opacity-[0.25]" : ""} 
-                        ${size === "xs" ? "rounded-[2px] text-[8px] py-[2px] md:px-[8px] px-[4px]" : size === "small" ? "rounded text-[12px] py-[4px] md:px-[12px] px-[8px]" : size === "large" ? "rounded-[8px] md:py-[16px] py-[10px] md:px-[32px] px-[28px]" : "rounded-[8px] md:py-[12px] py-[10px] md:px-[24px] px-[18px]"} 
+                        ${size === "xs" ? "rounded-[2px] text-[8px] py-[2px] md:px-[8px] px-[4px]" : size === "small" ? "rounded-[8px] text-[12px] md:py-[10px] py-[8px] md:px-[18px] px-[12px]" : size === "large" ? "rounded-[8px] text-[12px] md:py-[12px] py-[10px] md:px-[18px] px-[12px]" : "rounded-[8px] md:py-[12px] py-[10px] md:px-[24px] px-[18px]"} 
                         ${className} 
                     `}
                     {...props}

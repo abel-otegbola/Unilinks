@@ -1,6 +1,6 @@
 'use client';
 import { useContext, useState, useEffect } from "react";
-import { BankIcon, CurrencyCircleDollarIcon, WalletIcon, Plugs } from "@phosphor-icons/react";
+import { BankIcon, CurrencyCircleDollarIcon, WalletIcon, PlugsIcon } from "@phosphor-icons/react";
 import Dropdown from "../dropdown/dropdown";
 import Modal from "./Modal";
 import Input from "../input/input";
@@ -129,7 +129,7 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
             swiftCode: details.swiftCode || "",
             routingNumber: details.routingNumber || "",
           });
-        } else if (paymentMethod.type === "Cryptocurrency") {
+        } else if (paymentMethod.type === "crypto") {
           setCrypto({
             walletAddress: details.walletAddress || "",
             network: details.cryptoNetwork || "",
@@ -201,7 +201,7 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
           routingNumber: bank.routingNumber,
         };
         break;
-      case "Cryptocurrency":
+      case "crypto":
         updatedPaymentMethod.details = {
           walletAddress: crypto.walletAddress,
           cryptoNetwork: crypto.network,
@@ -300,7 +300,7 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
         )}
 
         {/* Cryptocurrency Fields */}
-        {paymentType === "Cryptocurrency" && (
+        {paymentType === "crypto" && (
           <>
             <Dropdown
               label="Cryptocurrency"
@@ -326,7 +326,7 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
                     className="flex-1"
                     disabled={isConnecting}
                   >
-                    <Plugs size={18} />
+                    <PlugsIcon size={18} />
                     {isConnecting ? "Connecting..." : "Connect Wallet"}
                   </Button>
                 ) : isConnected ? (
@@ -423,7 +423,7 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-3 mt-4">
+        <div className="flex gap-3 my-4">
           <Button onClick={handleSubmit} className="w-full whitespace-nowrap">
             Update Payment Method
           </Button>

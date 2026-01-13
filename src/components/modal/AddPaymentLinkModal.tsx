@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import { useFormik } from "formik";
 import Modal from "./Modal";
 import Input from "../input/input";
 import Dropdown from "../dropdown/dropdown";
@@ -7,6 +8,7 @@ import { PaymentLinkContext } from "../../contexts/PaymentLinkContext";
 import { PaymentContext } from "../../contexts/PaymentContext";
 import type { PaymentLinkInput } from "../../interface/payments";
 import { AuthContext } from "../../contexts/AuthContext";
+import { paymentLinkSchema } from "../../schema/paymentLinkSchema";
 
 interface AddPaymentLinkModalProps {
   isOpen: boolean;
@@ -29,89 +31,47 @@ export default function AddPaymentLinkModal({ isOpen, onClose }: AddPaymentLinkM
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useContext(AuthContext);
   
-  const [formData, setFormData] = useState({
-    amount: "",
-    currency: "USD",
-    expiresAt: "",
-    notes: "",
-    paymentMethodIds: [] as string[],
-  });
-
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
-  const resetForm = () => {
-    setFormData({
+  const formik = useFormik({
+    initialValues: {
       amount: "",
       currency: "USD",
-      paymentMethodIds: [],
       expiresAt: "",
       notes: "",
-    });
-    setErrors({});
-  };
+      paymentMethodIds: [] as string[],
+    },
+    validationSchema: paymentLinkSchema,
+    onSubmit: async (values, { resetForm }) => {
+      setIsLoading(true);
 
-  const validateForm = (): boolean => {
-    const newErrors: { [key: string]: string } = {};
+      try {
+        const paymentLinkData: PaymentLinkInput = {
+          paymentMethodIds: values.paymentMethodIds,
+          amount: parseFloat(values.amount),
+          currency: values.currency,
+          expiresAt: new Date(values.expiresAt),
+          notes: values.notes,
+          userId: user?.email || "unknown",
+        };
 
-    if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      newErrors.amount = "Valid amount is required";
-    }
-
-    if (!formData.currency) {
-      newErrors.currency = "Currency is required";
-    }
-    if (!formData.paymentMethodIds || formData.paymentMethodIds.length === 0) {
-      newErrors.paymentMethodIds = "At least one payment method is required";
-    }
-    if (!formData.expiresAt) {
-      newErrors.expiresAt = "Expiration date is required";
-    } else {
-      const expiryDate = new Date(formData.expiresAt);
-      const now = new Date();
-      if (expiryDate <= now) {
-        newErrors.expiresAt = "Expiration date must be in the future";
+        await createPaymentLink(paymentLinkData);
+        resetForm();
+        onClose();
+      } catch (error) {
+        console.error("Error creating payment link:", error);
+      } finally {
+        setIsLoading(false);
       }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
-
-    setIsLoading(true);
-
-    try {
-      const paymentLinkData: PaymentLinkInput = {
-        paymentMethodIds: formData.paymentMethodIds,
-        amount: parseFloat(formData.amount),
-        currency: formData.currency,
-        expiresAt: new Date(formData.expiresAt),
-        notes: formData.notes,
-        userId: user?.email || "unknown",
-      };
-
-      await createPaymentLink(paymentLinkData);
-      resetForm();
-      onClose();
-    } catch (error) {
-      console.error("Error creating payment link:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+  });
 
   const handleClose = () => {
-    resetForm();
+    formik.resetForm();
     onClose();
   };
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Create Payment Link" size="md">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={formik.handleSubmit} className="space-y-4">
         <h3 className="md:text-[18px] text-[16px] font-medium">Link Details</h3>
         
         {/* Amount and Currency Row */}
@@ -122,18 +82,19 @@ export default function AddPaymentLinkModal({ isOpen, onClose }: AddPaymentLinkM
             type="number"
             step="0.01"
             placeholder="0.00"
-            value={formData.amount}
-            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-            error={errors.amount}
+            value={formik.values.amount}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.amount && formik.errors.amount ? String(formik.errors.amount) : undefined}
           />
 
           <Dropdown
             label="Currency"
             name="currency"
-            value={formData.currency}
-            onChange={(value) => setFormData({ ...formData, currency: value })}
+            value={formik.values.currency}
+            onChange={(value) => formik.setFieldValue("currency", value)}
             options={currencyOptions}
-            error={errors.currency}
+            error={formik.touched.currency && formik.errors.currency ? String(formik.errors.currency) : undefined}
           />
         </div>
 
@@ -149,19 +110,16 @@ export default function AddPaymentLinkModal({ isOpen, onClose }: AddPaymentLinkM
                 >
                   <input
                     type="checkbox"
-                    checked={formData.paymentMethodIds.includes(method.id || "")}
+                    checked={formik.values.paymentMethodIds.includes(method.id || "")}
                     onChange={(e) => {
                       const methodId = method.id || "";
                       if (e.target.checked) {
-                        setFormData({
-                          ...formData,
-                          paymentMethodIds: [...formData.paymentMethodIds, methodId]
-                        });
+                        formik.setFieldValue("paymentMethodIds", [...formik.values.paymentMethodIds, methodId]);
                       } else {
-                        setFormData({
-                          ...formData,
-                          paymentMethodIds: formData.paymentMethodIds.filter(id => id !== methodId)
-                        });
+                        formik.setFieldValue(
+                          "paymentMethodIds",
+                          formik.values.paymentMethodIds.filter(id => id !== methodId)
+                        );
                       }
                     }}
                     className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
@@ -177,8 +135,8 @@ export default function AddPaymentLinkModal({ isOpen, onClose }: AddPaymentLinkM
               </p>
             )}
           </div>
-          {errors.paymentMethodIds && (
-            <p className="text-xs text-red-500">{errors.paymentMethodIds}</p>
+          {formik.touched.paymentMethodIds && formik.errors.paymentMethodIds && (
+            <p className="text-xs text-red-500">{formik.errors.paymentMethodIds}</p>
           )}
         </div>
 
@@ -187,9 +145,10 @@ export default function AddPaymentLinkModal({ isOpen, onClose }: AddPaymentLinkM
           label="Expiration Date"
           name="expiresAt"
           type="datetime-local"
-          value={formData.expiresAt}
-          onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
-          error={errors.expiresAt}
+          value={formik.values.expiresAt}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.expiresAt && formik.errors.expiresAt ? String(formik.errors.expiresAt) : undefined}
         />
 
         {/* Notes */}
@@ -200,8 +159,9 @@ export default function AddPaymentLinkModal({ isOpen, onClose }: AddPaymentLinkM
             name="notes"
             rows={4}
             placeholder="Add any additional notes or description..."
-            value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+            value={formik.values.notes}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             className="w-full px-3 py-2 border border-gray-500/20 rounded-lg focus:border-primary focus:outline-none resize-none"
           />
         </div>

@@ -8,8 +8,8 @@ import Input from "../../../components/input/input";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { EnvelopeIcon, LockIcon, SpinnerIcon } from '@phosphor-icons/react';
 
-export default function Login() {
-  const { login, loading, popup } = useContext(AuthContext);
+export default function Register() {
+  const { signup, loading, popup } = useContext(AuthContext);
   const inputRef = useRef<HTMLInputElement>(null);
   const [URLSearchParams] = useSearchParams()
   const [rememberMe, setRememberMe] = useState(false)
@@ -31,15 +31,25 @@ export default function Login() {
               <p className="opacity-70 text-center">Please log in to access your account</p>
             </div>
             <Formik
-              initialValues={{ email: "", password: "" }}
+              initialValues={{ email: "", password: "", displayName: "" }}
               validationSchema={loginSchema}
               onSubmit={(values, { setSubmitting }) => {
-                login(values.email, values.password, rememberMe, callbackURL || "/account");
+                signup(values.email, values.password, values.displayName, callbackURL || "/account");
                 setSubmitting(false);
               }}
             >
               {({ values, errors, touched, handleChange, handleSubmit, isSubmitting }) => (
                 <form onSubmit={handleSubmit} className="flex flex-col w-full gap-6" data-testid="login-form">
+                  <Input
+                    name="displayName"
+                    value={values.displayName}
+                    placeholder="e.g John Doe"
+                    leftIcon={<EnvelopeIcon size={20} />}
+                    onChange={handleChange}
+                    type="text"
+                    error={!touched.displayName ? "" : errors.displayName ? errors.displayName : ""}
+                    label="Full Name"
+                  />
                   <Input
                     name="email"
                     value={values.email}
@@ -73,10 +83,10 @@ export default function Login() {
                     </div>
                   </div>
                   <Button type="submit" className="w-full mt-4">
-                    {isSubmitting || loading ? <SpinnerIcon color="white" className="animate-spin w-[20px]" /> : "Login"}
+                    {isSubmitting || loading ? <SpinnerIcon color="white" className="animate-spin w-[20px]" /> : "Register"}
                   </Button>
 
-                  <p className="text-center">Don&apos;t have an account? <Link to="/auth/register" className="text-primary">Register here</Link></p>
+                  <p className="text-center">Already have an account? <Link to="/auth/login" className="text-primary">Login here</Link></p>
                 </form>
 
               )}

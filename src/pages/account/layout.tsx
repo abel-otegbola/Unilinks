@@ -25,7 +25,7 @@ function AccountLayout() {
   };
 
   if (!user) {
-    navigate("/login");
+    navigate("/auth/login");
     return null;
   }
 
@@ -69,7 +69,7 @@ function AccountLayout() {
               >
                 <img src="/profile.jpg" alt="Profile" className="w-10 h-10 rounded-full shadow border border-white outline outline-primary/[0.2] outline-offset-2" />
                 <div className="hidden sm:block text-start font-medium text-gray-700">
-                  <p>{user?.fullname || "User"}</p>
+                  <p>{user?.displayName || "User"}</p>
                   <p className="text-[10px]">{user?.email}</p>
                 </div>
               </button>

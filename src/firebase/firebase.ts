@@ -6,13 +6,13 @@ import { getAuth } from "firebase/auth";
 
 // Web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyAq--jmUTriEd8kX-quE-CT1xyuIBAbOmE",
-    authDomain: "omega-keep-392420.firebaseapp.com",
-    projectId: "omega-keep-392420",
-    storageBucket: "omega-keep-392420.firebasestorage.app",
-    messagingSenderId: "490930282746",
-    appId: "1:490930282746:web:383ff1fce8f2e0df926943",
-    measurementId: "G-4XVSXKGP4C"
+    apiKey: "AIzaSyAha2jy4MiB_BLNJggLerw3FsE2ps3_W2s",
+    authDomain: "unilinks-a06b1.firebaseapp.com",
+    projectId: "unilinks-a06b1",
+    storageBucket: "unilinks-a06b1.firebasestorage.app",
+    messagingSenderId: "609709144714",
+    appId: "1:609709144714:web:92e06f79d8888e67d68b73",
+    measurementId: "G-9W22MWF4JD"
 };
 
 // Initialize Firebase

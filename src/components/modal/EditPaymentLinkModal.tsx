@@ -1,4 +1,5 @@
 import { useContext, useState, useEffect } from "react";
+import { useFormik } from "formik";
 import Modal from "./Modal";
 import Input from "../input/input";
 import Dropdown from "../dropdown/dropdown";
@@ -6,6 +7,7 @@ import Button from "../button/Button";
 import { PaymentLinkContext } from "../../contexts/PaymentLinkContext";
 import { PaymentContext } from "../../contexts/PaymentContext";
 import type { PaymentLink } from "../../interface/payments";
+import { paymentLinkSchema } from "../../schema/paymentLinkSchema";
 
 interface EditPaymentLinkModalProps {
   isOpen: boolean;
@@ -28,15 +30,41 @@ export default function EditPaymentLinkModal({ isOpen, onClose, paymentLink }: E
   const { paymentMethods } = useContext(PaymentContext);
   const [isLoading, setIsLoading] = useState(false);
   
-  const [formData, setFormData] = useState({
-    amount: "",
-    currency: "USD",
-    expiresAt: "",
-    notes: "",
-    paymentMethodIds: [] as string[],
+  const formik = useFormik({
+    initialValues: {
+      amount: "",
+      currency: "USD",
+      expiresAt: "",
+      notes: "",
+      paymentMethodIds: [] as string[],
+    },
+    validationSchema: paymentLinkSchema,
+    onSubmit: async (values) => {
+      if (!paymentLink?.id) return;
+
+      setIsLoading(true);
+
+      try {
+        await updatePaymentLink(paymentLink.id, {
+          amount: parseFloat(values.amount),
+          currency: values.currency,
+          expiresAt: new Date(values.expiresAt),
+          notes: values.notes,
+          paymentMethodIds: values.paymentMethodIds,
+          userId: paymentLink.userId,
+        });
+        onClose();
+      } catch (error) {
+        console.error("Error updating payment link:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
   });
 
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  useEffect(() => {
+    console.log("Payment Methods:", paymentLink);
+  }, [paymentLink]);
 
   // Load payment link data when modal opens
   useEffect(() => {
@@ -44,7 +72,7 @@ export default function EditPaymentLinkModal({ isOpen, onClose, paymentLink }: E
       const expiresAtDate = new Date(paymentLink.expiresAt);
       const formattedDate = expiresAtDate.toISOString().slice(0, 16);
       
-      setFormData({
+      formik.setValues({
         amount: paymentLink.amount.toString(),
         currency: paymentLink.currency,
         expiresAt: formattedDate,
@@ -52,81 +80,17 @@ export default function EditPaymentLinkModal({ isOpen, onClose, paymentLink }: E
         paymentMethodIds: paymentLink.paymentMethodIds || [],
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentLink, isOpen]);
 
-  const resetForm = () => {
-    setFormData({
-      amount: "",
-      currency: "USD",
-      expiresAt: "",
-      notes: "",
-      paymentMethodIds: [],
-    });
-    setErrors({});
-  };
-
-  const validateForm = (): boolean => {
-    const newErrors: { [key: string]: string } = {};
-
-    if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      newErrors.amount = "Valid amount is required";
-    }
-
-    if (!formData.currency) {
-      newErrors.currency = "Currency is required";
-    }
-
-    if (!formData.paymentMethodIds || formData.paymentMethodIds.length === 0) {
-      newErrors.paymentMethodIds = "At least one payment method is required";
-    }
-
-    if (!formData.expiresAt) {
-      newErrors.expiresAt = "Expiration date is required";
-    } else {
-      const expiryDate = new Date(formData.expiresAt);
-      const now = new Date();
-      if (expiryDate <= now) {
-        newErrors.expiresAt = "Expiration date must be in the future";
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm() || !paymentLink?.id) return;
-
-    setIsLoading(true);
-
-    try {
-      await updatePaymentLink(paymentLink.id, {
-        amount: parseFloat(formData.amount),
-        currency: formData.currency,
-        expiresAt: new Date(formData.expiresAt),
-        notes: formData.notes,
-        paymentMethodIds: formData.paymentMethodIds,
-        userId: paymentLink.userId,
-      });
-      resetForm();
-      onClose();
-    } catch (error) {
-      console.error("Error updating payment link:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleClose = () => {
-    resetForm();
+    formik.resetForm();
     onClose();
   };
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Edit Payment Link" size="md">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={formik.handleSubmit} className="space-y-4">
         <h3 className="md:text-[18px] text-[16px] font-medium">Link Details</h3>
         
         {/* Amount and Currency Row */}
@@ -137,18 +101,19 @@ export default function EditPaymentLinkModal({ isOpen, onClose, paymentLink }: E
             type="number"
             step="0.01"
             placeholder="0.00"
-            value={formData.amount}
-            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-            error={errors.amount}
+            value={formik.values.amount}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.amount && formik.errors.amount ? String(formik.errors.amount) : undefined}
           />
 
           <Dropdown
             label="Currency"
             name="currency"
-            value={formData.currency}
-            onChange={(value) => setFormData({ ...formData, currency: value })}
+            value={formik.values.currency}
+            onChange={(value) => formik.setFieldValue("currency", value)}
             options={currencyOptions}
-            error={errors.currency}
+            error={formik.touched.currency && formik.errors.currency ? String(formik.errors.currency) : undefined}
           />
         </div>
 
@@ -164,19 +129,16 @@ export default function EditPaymentLinkModal({ isOpen, onClose, paymentLink }: E
                 >
                   <input
                     type="checkbox"
-                    checked={formData.paymentMethodIds.includes(method.id || "")}
+                    checked={formik.values.paymentMethodIds.includes(method.id || "")}
                     onChange={(e) => {
                       const methodId = method.id || "";
                       if (e.target.checked) {
-                        setFormData({
-                          ...formData,
-                          paymentMethodIds: [...formData.paymentMethodIds, methodId]
-                        });
+                        formik.setFieldValue("paymentMethodIds", [...formik.values.paymentMethodIds, methodId]);
                       } else {
-                        setFormData({
-                          ...formData,
-                          paymentMethodIds: formData.paymentMethodIds.filter(id => id !== methodId)
-                        });
+                        formik.setFieldValue(
+                          "paymentMethodIds",
+                          formik.values.paymentMethodIds.filter(id => id !== methodId)
+                        );
                       }
                     }}
                     className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
@@ -192,8 +154,8 @@ export default function EditPaymentLinkModal({ isOpen, onClose, paymentLink }: E
               </p>
             )}
           </div>
-          {errors.paymentMethodIds && (
-            <p className="text-xs text-red-500">{errors.paymentMethodIds}</p>
+          {formik.touched.paymentMethodIds && formik.errors.paymentMethodIds && (
+            <p className="text-xs text-red-500">{formik.errors.paymentMethodIds}</p>
           )}
         </div>
 
@@ -202,9 +164,10 @@ export default function EditPaymentLinkModal({ isOpen, onClose, paymentLink }: E
           label="Expiration Date"
           name="expiresAt"
           type="datetime-local"
-          value={formData.expiresAt}
-          onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
-          error={errors.expiresAt}
+          value={formik.values.expiresAt}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.expiresAt && formik.errors.expiresAt ? String(formik.errors.expiresAt) : undefined}
         />
 
         {/* Notes */}
@@ -215,8 +178,9 @@ export default function EditPaymentLinkModal({ isOpen, onClose, paymentLink }: E
             name="notes"
             rows={4}
             placeholder="Add any additional notes or description..."
-            value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+            value={formik.values.notes}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             className="w-full px-3 py-2 border border-gray-500/20 rounded-lg focus:border-primary focus:outline-none resize-none"
           />
         </div>

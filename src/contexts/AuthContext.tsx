@@ -10,7 +10,7 @@ type values = {
     loading: boolean;
     login: (username: string, password: string, remember: boolean, callbackUrl: string) => Promise<void>;
     logout: () => Promise<void>;
-    signup: (email: string, password: string, fullname: string) => Promise<void>;
+    signup: (email: string, password: string, displayName: string, callbackURL?: string) => Promise<void>;
     socialSignIn: (provider: 'google' | 'facebook' | 'github') => Promise<void>;
     popup?: { type: string; msg: string; timestamp: number };
 }
@@ -52,7 +52,7 @@ const AuthProvider = ({ children }: { children: ReactNode}) => {
       const userData: IUser = {
         id: firebaseUser.uid,
         email: firebaseUser.email || "",
-        fullname: firebaseUser.displayName || "",
+        displayName: firebaseUser.displayName || "",
       };
       setUser(userData);
 
@@ -85,16 +85,16 @@ const AuthProvider = ({ children }: { children: ReactNode}) => {
     }
   };
 
-  const signup = async (email: string, password: string, fullname: string) => {
+  const signup = async (email: string, password: string, displayName: string, callbackURL?: string) => {
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
 
       // Update user profile with display name
-      if (fullname) {
+      if (displayName) {
         await updateProfile(firebaseUser, {
-          displayName: fullname
+          displayName: displayName
         });
       }
 
@@ -112,7 +112,7 @@ const AuthProvider = ({ children }: { children: ReactNode}) => {
       const userData: IUser = {
         id: firebaseUser.uid,
         email: firebaseUser.email || "",
-        fullname: fullname || firebaseUser.displayName || "",
+        displayName: displayName || firebaseUser.displayName || "",
       };
       setUser(userData);
 
@@ -122,7 +122,7 @@ const AuthProvider = ({ children }: { children: ReactNode}) => {
         timestamp: Date.now() 
       });
 
-      navigate("/account");
+      navigate(callbackURL || "/account");
     } catch (error: unknown) {
         let msg = "Signup failed";
         if (error && typeof error === "object" && "code" in error) {
@@ -181,7 +181,7 @@ const AuthProvider = ({ children }: { children: ReactNode}) => {
       const userData: IUser = {
         id: firebaseUser.uid,
         email: firebaseUser.email || "",
-        fullname: firebaseUser.displayName || "",
+        displayName: firebaseUser.displayName || "",
       };
       setUser(userData);
 

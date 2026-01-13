@@ -9,15 +9,15 @@ export default function Homepage() {
 
   return (
     <main className="bg-[url('/bg.svg')] bg-cover bg-top min-h-screen flex flex-col">
-      <header className="flex justify-between items-center sticky top-4 sm:w-[400px] w-[calc(100%-32px)] bg-white/[0.8] backdrop-blur-sm border-2 border-white shadow-sm rounded-full mx-auto p-2 pl-4 mt-4 items-center">
-        <img src="/logo.svg" alt="UniLinks logo" width={64} height={32} />
+      <header className="flex justify-between items-center sticky sm:top-4 sm:w-[400px] w-full bg-white/[0.8] backdrop-blur-sm sm:border-2 sm:border-white sm:shadow-sm sm:rounded-[12px] mx-auto sm:py-2 sm:pr-2 p-4 pl-4 sm:mt-4 items-center">
+        <img src="/logo.svg" alt="UniLinks logo" width={64} height={32} className="sm:ml-0 ml-1" />
 
         {user ? (
           <Link to="/account">
             <img src="/profile.jpg" alt="Profile" className="w-10 h-10 rounded-full shadow border border-white outline outline-primary/[0.2] outline-offset-2" />
           </Link>
         ) : (
-        <Button variant="secondary" href="/auth/login" className="rounded-full">Login</Button>
+        <Button variant="secondary" size="small" href="/auth/login" className="">Login</Button>
         )}
       </header>
 

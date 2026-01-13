@@ -243,7 +243,7 @@ export default function AddPaymentMethodModal({ isOpen, onClose, onAdd }: AddPay
         )}
 
         {/* Cryptocurrency Fields */}
-        {paymentType === "Cryptocurrency" && (
+        {paymentType === "crypto" && (
           <>
             <Dropdown
               label="Cryptocurrency"
@@ -360,7 +360,7 @@ export default function AddPaymentMethodModal({ isOpen, onClose, onAdd }: AddPay
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-3 mt-4">
+        <div className="flex gap-3 my-4">
           <Button onClick={handleSubmit} className="w-full whitespace-nowrap">
             Add Payment Method
           </Button>
