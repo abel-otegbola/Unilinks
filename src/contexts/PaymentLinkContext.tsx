@@ -52,12 +52,17 @@ const PaymentLinkProvider = ({ children }: { children: ReactNode }) => {
 
   // Real-time listener for payment links
   useEffect(() => {
+    if (!user?.id) {
+      setPaymentLinks([]);
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
 
     const q = query(
       collection(db, "payment_links"),
-      where("userId", "==", user?.email || ""),
+      where("userId", "==", user.id),
       orderBy("createdAt", "desc")
     );
 
@@ -97,7 +102,6 @@ const PaymentLinkProvider = ({ children }: { children: ReactNode }) => {
     );
 
     return () => unsubscribe();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   // Create a new payment link

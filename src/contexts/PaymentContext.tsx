@@ -38,9 +38,13 @@ const PaymentProvider = ({ children }: { children: ReactNode }) => {
 
   
   useEffect(() => {
+    if (!user?.id) {
+      return;
+    }
+
     const q = query(
       collection(db, "payment_methods"),
-      where("userId", "==", user?.email || ""),
+      where("userId", "==", user.id),
       orderBy("createdAt", "desc")
     );
 
@@ -74,7 +78,7 @@ const PaymentProvider = ({ children }: { children: ReactNode }) => {
     );
 
     return () => unsubscribe();
-  }, [user?.email]);
+  }, [user?.id]);
 
   // Legacy function - keeping for backward compatibility
   const getUserPaymentMethods = () => {
@@ -85,6 +89,9 @@ const PaymentProvider = ({ children }: { children: ReactNode }) => {
   // Create a new payment method
   const createPaymentMethod = async (data: PaymentMethodInput): Promise<string> => {
     try {
+      console.log('Creating payment method with userId:', data.userId);
+      console.log('Current user from context:', user);
+      
       const paymentMethodData = {
         userId: data.userId,
         name: data.name,

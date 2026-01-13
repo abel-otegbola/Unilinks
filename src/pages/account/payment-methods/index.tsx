@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { PaymentContext } from "../../../contexts/PaymentContext";
 import type { PaymentMethod } from "../../../interface/payments";
-import { AuthContext } from "../../../contexts/AuthContext";
 import AddPaymentMethodModal from "../../../components/modal/AddPaymentMethodModal";
 import EditPaymentMethodModal from "../../../components/modal/EditPaymentMethodModal";
 import { PencilIcon, PlusCircleIcon, TrashIcon } from "@phosphor-icons/react";
@@ -10,7 +9,6 @@ import { Link } from "react-router-dom";
 
 function PaymentMethodsPage() {
   const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
-  const { user } = useContext(AuthContext);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { 
@@ -33,12 +31,11 @@ function PaymentMethodsPage() {
         type: paymentMethod.type,
         name: paymentMethod.name,
         details: paymentMethod.details,
-        userId: user?.email || "unknown",
+        userId: paymentMethod.userId,
         status: 'active',
         createdAt: new Date(),
     };
-    console.log(newMethod);
-    createPaymentMethod({name: newMethod.name, type: newMethod.type, details: newMethod.details, userId: user?.email || "unknown", status: newMethod.status});
+    createPaymentMethod({name: newMethod.name, type: newMethod.type, details: newMethod.details, userId: newMethod.userId, status: newMethod.status});
   };
 
   const handleEditPaymentMethod = (id: string, paymentMethod: PaymentMethod) => {
@@ -78,7 +75,7 @@ function PaymentMethodsPage() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {
-              paymentMethods.map((method) => (
+              paymentMethods?.map((method) => (
                 <tr key={method.id} className="border border-gray-500/[0.1] rounded-lg">
                   <td className="px-6 py-4 whitespace-nowrap"><Link to={`/account/payment-methods/${method.id}`}>{method.name}</Link></td>
                   <td className="px-6 py-4 whitespace-nowrap"><Link to={`/account/payment-methods/${method.id}`}>{method.type}</Link></td>

@@ -125,6 +125,9 @@ export default function AddPaymentMethodModal({ isOpen, onClose, onAdd }: AddPay
   const handleSubmit = () => {
     if (!validateForm()) return;
 
+    console.log('AddPaymentMethodModal - user object:', user);
+    console.log('AddPaymentMethodModal - user.id:', user?.id);
+
     const paymentMethod = {
       userId: user?.id || "",
       type: paymentType,

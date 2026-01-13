@@ -50,7 +50,7 @@ export default function AddPaymentLinkModal({ isOpen, onClose }: AddPaymentLinkM
           currency: values.currency,
           expiresAt: new Date(values.expiresAt),
           notes: values.notes,
-          userId: user?.email || "unknown",
+          userId: user?.id || "unknown",
         };
 
         await createPaymentLink(paymentLinkData);

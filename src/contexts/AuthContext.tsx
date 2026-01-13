@@ -1,7 +1,7 @@
-import { createContext, useState, type ReactNode } from "react";
+import { createContext, useState, useEffect, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocalStorage } from "../customHooks/useLocaStorage";
-import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, GithubAuthProvider } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, GithubAuthProvider, onAuthStateChanged } from "firebase/auth";
 import { app } from "../firebase/firebase";
 import type { IUser } from "../interface/Auth";
 
@@ -20,42 +20,43 @@ const AuthContext = createContext({} as values);
 export { AuthContext };
 
 const AuthProvider = ({ children }: { children: ReactNode}) => {
-    const [user, setUser] = useLocalStorage("user", null);
+    const [user, setUser] = useState<IUser | null>(null);
     const [popup, setPopup] = useState({ type: "", msg: "", timestamp: 0 });
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const auth = getAuth(app);
+
+  // Listen to Firebase auth state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      console.log('Auth state changed:', firebaseUser ? {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName
+      } : 'Not authenticated');
+      
+      if (firebaseUser) {
+        const userData: IUser = {
+          id: firebaseUser.uid,
+          email: firebaseUser.email || "",
+          displayName: firebaseUser.displayName || "",
+        };
+        setUser(userData);
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [auth]);
 
   const login = async (email: string, password: string, remember: boolean, callbackUrl?: string) => {
     setLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const firebaseUser = userCredential.user;
-
-      // Get the ID token
-      const token = await firebaseUser.getIdToken();
-
-      // Store token based on remember preference
-      try {
-        if (remember) {
-          localStorage.setItem("userToken", token);
-          sessionStorage.removeItem("userToken");
-        } else {
-          sessionStorage.setItem("userToken", token);
-          localStorage.removeItem("userToken");
-        }
-      } catch (e) {
-        console.warn("Could not access web storage to persist token", e);
-      }
-
-      // Set user data
-      const userData: IUser = {
-        id: firebaseUser.uid,
-        email: firebaseUser.email || "",
-        displayName: firebaseUser.displayName || "",
-      };
-      setUser(userData);
-
+      await signInWithEmailAndPassword(auth, email, password);
+      // onAuthStateChanged will handle setting the user
+      
       setPopup({ 
         type: "success", 
         msg: "Logged in successfully", 
@@ -97,24 +98,7 @@ const AuthProvider = ({ children }: { children: ReactNode}) => {
           displayName: displayName
         });
       }
-
-      // Get the ID token
-      const token = await firebaseUser.getIdToken();
-
-      // Store token in session storage by default
-      try {
-        sessionStorage.setItem("userToken", token);
-      } catch (e) {
-        console.warn("Could not access web storage to persist token", e);
-      }
-
-      // Set user data
-      const userData: IUser = {
-        id: firebaseUser.uid,
-        email: firebaseUser.email || "",
-        displayName: displayName || firebaseUser.displayName || "",
-      };
-      setUser(userData);
+      // onAuthStateChanged will handle setting the user
 
       setPopup({ 
         type: "success", 
@@ -164,26 +148,8 @@ const AuthProvider = ({ children }: { children: ReactNode}) => {
           throw new Error('Invalid provider');
       }
 
-      const result = await signInWithPopup(auth, authProvider);
-      const firebaseUser = result.user;
-
-      // Get the ID token
-      const token = await firebaseUser.getIdToken();
-
-      // Store token in session storage
-      try {
-        sessionStorage.setItem("userToken", token);
-      } catch (e) {
-        console.warn("Could not access web storage to persist token", e);
-      }
-
-      // Set user data
-      const userData: IUser = {
-        id: firebaseUser.uid,
-        email: firebaseUser.email || "",
-        displayName: firebaseUser.displayName || "",
-      };
-      setUser(userData);
+      await signInWithPopup(auth, authProvider);
+      // onAuthStateChanged will handle setting the user
 
       setPopup({ 
         type: "success", 
@@ -220,12 +186,7 @@ const AuthProvider = ({ children }: { children: ReactNode}) => {
     setLoading(true);
     try {
       await signOut(auth);
-      
-      // Clear stored tokens
-      localStorage.removeItem("userToken");
-      sessionStorage.removeItem("userToken");
-      
-      setUser(null);
+      // onAuthStateChanged will handle clearing the user
       
       setPopup({ 
         type: "success", 
