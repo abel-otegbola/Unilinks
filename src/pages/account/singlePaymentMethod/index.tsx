@@ -80,7 +80,7 @@ function SinglePaymentMethodPage() {
                         {Object.entries(paymentMethod.details).map(([key, value]) => (
                             <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                 <p className="opacity-[0.7] capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
-                                <p className="text-sm font-medium">{value}</p>
+                                <p className="text-sm font-medium truncate">{value}</p>
                             </div>
                         ))}
                     </div>
