@@ -2,25 +2,10 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { PaymentLinkContext } from "../../../contexts/PaymentLinkContext";
 import { PaymentContext } from "../../../contexts/PaymentContext";
-import { getAuth, updateProfile, updateEmail, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
-import { collection, query, where, getDocs, deleteDoc, doc } from "firebase/firestore";
-import { db } from "../../../firebase/firebase";
-import Input from "../../../components/input/input";
 import Button from "../../../components/button/Button";
-import Modal from "../../../components/modal/Modal";
-import { PencilIcon, TrashIcon, UserCircleIcon, EnvelopeIcon, WarningIcon } from "@phosphor-icons/react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { getProfileUpdateErrorMessage, getAccountDeletionErrorMessage } from "../../../utils/helpers/firebaseErrorHandler";
-
-const profileSchema = Yup.object().shape({
-  displayName: Yup.string().required("Name is required").min(2, "Name must be at least 2 characters"),
-  email: Yup.string().email("Invalid email address").required("Email is required"),
-});
-
-const deleteAccountSchema = Yup.object().shape({
-  password: Yup.string().required("Password is required for account deletion"),
-});
+import EditProfileModal from "../../../components/modal/EditProfileModal";
+import DeleteAccountModal from "../../../components/modal/DeleteAccountModal";
+import { PencilIcon, TrashIcon, UserCircleIcon, EnvelopeIcon } from "@phosphor-icons/react";
 
 function ProfilePage() {
   const { user, logout } = useContext(AuthContext);
@@ -28,116 +13,18 @@ function ProfilePage() {
   const { paymentMethods } = useContext(PaymentContext);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState("");
-
-  const auth = getAuth();
-  const currentUser = auth.currentUser;
 
   // Count user's data
   const userPaymentLinks = paymentLinks;
   const userPaymentMethods = paymentMethods;
 
-  // Edit profile formik
-  const editFormik = useFormik({
-    initialValues: {
-      displayName: user?.displayName || "",
-      email: user?.email || "",
-    },
-    validationSchema: profileSchema,
-    onSubmit: async (values) => {
-      if (!currentUser) return;
+  const handleProfileUpdateSuccess = () => {
+    window.location.reload();
+  };
 
-      try {
-        // Update display name
-        if (values.displayName !== user?.displayName) {
-          await updateProfile(currentUser, {
-            displayName: values.displayName,
-          });
-        }
-
-        // Update email if changed
-        if (values.email !== user?.email) {
-          await updateEmail(currentUser, values.email);
-        }
-
-        // Update local storage
-        const updatedUser = {
-          ...user,
-          displayName: values.displayName,
-          email: values.email,
-        };
-        localStorage.setItem("user", JSON.stringify(updatedUser));
-
-        alert("Profile updated successfully!");
-        setIsEditModalOpen(false);
-        window.location.reload();
-      } catch (error: unknown) {
-        console.error("Error updating profile:", error);
-        const errorMessage = getProfileUpdateErrorMessage(error);
-        alert(errorMessage);
-      }
-    },
-  });
-
-  // Delete account formik
-  const deleteFormik = useFormik({
-    initialValues: {
-      password: "",
-    },
-    validationSchema: deleteAccountSchema,
-    onSubmit: async (values) => {
-      if (!currentUser || !user?.email) return;
-
-      setIsDeleting(true);
-      setDeleteError("");
-
-      try {
-        // Re-authenticate user before deletion
-        const credential = EmailAuthProvider.credential(user.email, values.password);
-        await reauthenticateWithCredential(currentUser, credential);
-
-        // Delete all payment links
-        const linksQuery = query(
-          collection(db, "paymentLinks"),
-          where("userId", "==", user.id)
-        );
-        const linksSnapshot = await getDocs(linksQuery);
-        const linkDeletions = linksSnapshot.docs.map(docSnapshot =>
-          deleteDoc(doc(db, "paymentLinks", docSnapshot.id))
-        );
-        await Promise.all(linkDeletions);
-
-        // Delete all payment methods
-        const methodsQuery = query(
-          collection(db, "paymentMethods"),
-          where("userId", "==", user.id)
-        );
-        const methodsSnapshot = await getDocs(methodsQuery);
-        const methodDeletions = methodsSnapshot.docs.map(docSnapshot =>
-          deleteDoc(doc(db, "paymentMethods", docSnapshot.id))
-        );
-        await Promise.all(methodDeletions);
-
-        // Delete user account
-        await deleteUser(currentUser);
-
-        // Clear storage and logout
-        localStorage.removeItem("user");
-        localStorage.removeItem("userToken");
-        sessionStorage.removeItem("userToken");
-
-        alert("Account deleted successfully");
-        await logout();
-      } catch (error: unknown) {
-        console.error("Error deleting account:", error);
-        const errorMessage = getAccountDeletionErrorMessage(error);
-        setDeleteError(errorMessage);
-      } finally {
-        setIsDeleting(false);
-      }
-    },
-  });
+  const handleAccountDeletionSuccess = async () => {
+    await logout();
+  };
 
   if (!user) {
     return (
@@ -231,118 +118,24 @@ function ProfilePage() {
       </div>
 
       {/* Edit Profile Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit Profile">
-        <form onSubmit={editFormik.handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Display Name</label>
-            <Input
-              type="text"
-              name="displayName"
-              value={editFormik.values.displayName}
-              onChange={editFormik.handleChange}
-              onBlur={editFormik.handleBlur}
-              placeholder="Enter your name"
-            />
-            {editFormik.touched.displayName && editFormik.errors.displayName && (
-              <p className="text-red-500 text-xs mt-1">{String(editFormik.errors.displayName)}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Email Address</label>
-            <Input
-              type="email"
-              name="email"
-              value={editFormik.values.email}
-              onChange={editFormik.handleChange}
-              onBlur={editFormik.handleBlur}
-              placeholder="Enter your email"
-            />
-            {editFormik.touched.email && editFormik.errors.email && (
-              <p className="text-red-500 text-xs mt-1">{String(editFormik.errors.email)}</p>
-            )}
-            <p className="text-xs text-gray-500 mt-1">
-              Note: Changing your email may require you to log in again.
-            </p>
-          </div>
-
-          <div className="flex gap-2 pt-4">
-            <Button type="submit" disabled={editFormik.isSubmitting || !editFormik.isValid}>
-              {editFormik.isSubmitting ? "Saving..." : "Save Changes"}
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setIsEditModalOpen(false)}
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        currentDisplayName={user.displayName}
+        currentEmail={user.email}
+        onSuccess={handleProfileUpdateSuccess}
+      />
 
       {/* Delete Account Modal */}
-      <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} title="Delete Account">
-        <div className="space-y-4">
-          <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <WarningIcon size={24} className="text-red-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold text-red-600 mb-1">Warning: This action cannot be undone!</p>
-              <p className="text-sm text-red-700">
-                Deleting your account will permanently remove:
-              </p>
-              <ul className="text-sm text-red-700 list-disc list-inside mt-2 space-y-1">
-                <li>{userPaymentLinks.length} payment link(s)</li>
-                <li>{userPaymentMethods.length} payment method(s)</li>
-                <li>All your account data</li>
-              </ul>
-            </div>
-          </div>
-
-          <form onSubmit={deleteFormik.handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Enter your password to confirm
-              </label>
-              <Input
-                type="password"
-                name="password"
-                value={deleteFormik.values.password}
-                onChange={deleteFormik.handleChange}
-                onBlur={deleteFormik.handleBlur}
-                placeholder="Enter your password"
-              />
-              {deleteFormik.touched.password && deleteFormik.errors.password && (
-                <p className="text-red-500 text-xs mt-1">{String(deleteFormik.errors.password)}</p>
-              )}
-              {deleteError && (
-                <p className="text-red-500 text-xs mt-1">{deleteError}</p>
-              )}
-            </div>
-
-            <div className="flex gap-2 pt-4">
-              <Button
-                type="submit"
-                className="bg-red-600 hover:bg-red-700"
-                disabled={isDeleting || !deleteFormik.isValid}
-              >
-                {isDeleting ? "Deleting..." : "Delete My Account"}
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => {
-                  setIsDeleteModalOpen(false);
-                  deleteFormik.resetForm();
-                  setDeleteError("");
-                }}
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
-        </div>
-      </Modal>
+      <DeleteAccountModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        userEmail={user.email}
+        userId={user.id}
+        paymentLinksCount={userPaymentLinks.length}
+        paymentMethodsCount={userPaymentMethods.length}
+        onSuccess={handleAccountDeletionSuccess}
+      />
     </div>
   );
 }

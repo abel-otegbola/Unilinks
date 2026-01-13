@@ -67,7 +67,7 @@ const Sidebar = ({ isOpen, onClose, pathname, user }: SidebarProps) => {
 
         {/* User Profile in Sidebar */}
         <div className="p-4 border-t border-gray-200">
-            <button
+            <Link to="/account/profile" onClick={onClose}
                 className="flex items-center gap-2 hover:bg-gray-50 rounded-lg p-2 transition-colors"
             >
                 <img src="/profile.jpg" alt="Profile" className="w-10 h-10 rounded-full shadow border border-white outline outline-primary/[0.2] outline-offset-2" />
@@ -75,7 +75,7 @@ const Sidebar = ({ isOpen, onClose, pathname, user }: SidebarProps) => {
                     <p>{user?.fullname || user?.email?.split("@")[0]}</p>
                     <p className="text-[10px]">{user?.email}</p>
                 </div>
-            </button>
+            </Link>
         </div>
       </div>
     </aside>

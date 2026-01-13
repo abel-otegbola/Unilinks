@@ -109,8 +109,8 @@ export default function ChangePasswordModal({ isOpen, onClose, userEmail }: Chan
           </div>
         )}
 
-        <div className="flex gap-2 pt-4">
-          <Button type="submit" disabled={formik.isSubmitting || !formik.isValid}>
+        <div className="flex gap-2 py-4">
+          <Button type="submit" disabled={formik.isSubmitting || !formik.isValid} >
             {formik.isSubmitting ? "Changing..." : "Change Password"}
           </Button>
           <Button

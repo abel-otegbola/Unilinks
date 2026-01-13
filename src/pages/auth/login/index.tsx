@@ -6,10 +6,10 @@ import { loginSchema } from "../../../schema/authSchema";
 import Toast from "../../../components/toast/Toast";
 import Input from "../../../components/input/input";
 import { AuthContext } from "../../../contexts/AuthContext";
-import { EnvelopeIcon, LockIcon, SpinnerIcon } from '@phosphor-icons/react';
+import { EnvelopeIcon, LockIcon, SpinnerIcon, GoogleLogoIcon } from '@phosphor-icons/react';
 
 export default function Login() {
-  const { login, loading, popup } = useContext(AuthContext);
+  const { login, loading, popup, socialSignIn } = useContext(AuthContext);
   const inputRef = useRef<HTMLInputElement>(null);
   const [URLSearchParams] = useSearchParams()
   const [rememberMe, setRememberMe] = useState(false)
@@ -23,7 +23,7 @@ export default function Login() {
     <div className="h-screen flex sm:items-center justify-between">
       
       {/* 2xl:w-[54.375%] xl:w-[55%] md:w-[55%] */}
-      <div className="flex items-center justify-center h-full w-full">
+      <div className="flex items-center justify-center pt-[10%] h-full w-full">
         <div className="2xl:w-[629px] sm:w-[440px] md:mx-0 mx-auto w-full p-8">
           <div className="relative flex flex-col justify-center 2xl:gap-12 gap-8">
             <div>
@@ -74,6 +74,23 @@ export default function Login() {
                   </div>
                   <Button type="submit" className="w-full mt-4">
                     {isSubmitting || loading ? <SpinnerIcon color="white" className="animate-spin w-[20px]" /> : "Login"}
+                  </Button>
+
+                  <div className="flex items-center gap-3 my-2">
+                    <div className="flex-1 h-px bg-gray-300"></div>
+                    <span className="text-sm text-gray-500">OR</span>
+                    <div className="flex-1 h-px bg-gray-300"></div>
+                  </div>
+
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="w-full flex items-center justify-center gap-2"
+                    onClick={() => socialSignIn('google')}
+                    disabled={loading}
+                  >
+                    <GoogleLogoIcon size={20} />
+                    Sign in with Google
                   </Button>
 
                   <p className="text-center">Don&apos;t have an account? <Link to="/auth/register" className="text-primary">Register here</Link></p>
