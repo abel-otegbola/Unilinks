@@ -184,6 +184,43 @@ function SingleLinkPage() {
                     <p className="">{paymentLink.notes}</p>
                     </div>
                 )}
+
+                {/* Uploads */}
+                {paymentLink.uploads && paymentLink.uploads.length > 0 && (
+                    <div className="flex flex-col gap-3 p-4 border border-gray-500/[0.1] rounded-lg">
+                        <p className="font-semibold">Payment Proofs ({paymentLink.uploads.length})</p>
+                        <div className="space-y-3">
+                            {paymentLink.uploads.map((upload, index) => (
+                                <div key={index} className="flex flex-col gap-2 p-3 bg-gray-50 rounded-lg border border-gray-500/[0.1]">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-gray-900 truncate">
+                                                {upload.fileName}
+                                            </p>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Uploaded {formatDate(upload.uploadedAt instanceof Date ? upload.uploadedAt : (upload.uploadedAt as any).toDate())}
+                                            </p>
+                                            {upload.uploadedBy && (
+                                                <p className="text-xs text-gray-500">
+                                                    By: {upload.uploadedBy}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <a
+                                        href={upload.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-primary hover:underline flex items-center gap-1"
+                                    >
+                                        <DownloadSimpleIcon size={14} />
+                                        View/Download
+                                    </a>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="flex-1 flex flex-col gap-8">

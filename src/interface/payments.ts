@@ -26,13 +26,21 @@ export interface PaymentLink {
   amount: number;
   currency: string;
   link: string;
-  status: 'active' | 'expired' | 'completed' | 'cancelled';
+  status: 'active' | 'expired' | 'completed' | 'cancelled' | 'pending';
   createdAt: Date;
   expiresAt: Date;
   reference: string;
   notes?: string;
   paymentMethodIds?: string[];
   timeline: TimelineEvent[];
+  uploads?: PaymentProof[];
+}
+
+export interface PaymentProof {
+  url: string;
+  fileName: string;
+  uploadedAt: Date;
+  uploadedBy?: string;
 }
 
 export interface PaymentLinkInput {

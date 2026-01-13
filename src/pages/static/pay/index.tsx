@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../../../firebase/firebase";
-import { CardsIcon, CopyIcon, CheckCircleIcon, Clock } from "@phosphor-icons/react";
+import { doc, getDoc, collection, query, where, getDocs, updateDoc, serverTimestamp } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "../../../firebase/firebase";
+import { CardsIcon, CopyIcon, CheckCircleIcon, Clock, CurrencyCircleDollarIcon } from "@phosphor-icons/react";
 import type { PaymentLink, PaymentMethod } from "../../../interface/payments";
 import { formatCurrency } from "../../../utils/helpers/formatCurrency";
 import { formatDate } from "../../../utils/helpers/formatDate";
+import { convertToCrypto, formatCryptoAmount, getCryptoSymbol } from "../../../utils/helpers/cryptoConversion";
 import Button from "../../../components/button/Button";
+import PaymentConfirmationModal from "../../../components/modal/PaymentConfirmationModal";
 
 function PaymentPage() {
     const { reference } = useParams<{ reference: string }>();
@@ -15,6 +18,9 @@ function PaymentPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+    const [cryptoConversions, setCryptoConversions] = useState<{ [methodId: string]: { amount: number; rate: number; loading: boolean } }>({});
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [paymentLinkDocId, setPaymentLinkDocId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchPaymentLink = async () => {
@@ -40,6 +46,9 @@ function PaymentPage() {
                 const linkDoc = querySnapshot.docs[0];
                 const data = linkDoc.data();
 
+                // Store the document ID for later updates
+                setPaymentLinkDocId(linkDoc.id);
+
                 const link: PaymentLink = {
                     id: linkDoc.id,
                     userId: data.userId,
@@ -53,6 +62,7 @@ function PaymentPage() {
                     notes: data.notes,
                     timeline: data.timeline || [],
                     paymentMethodIds: data.paymentMethodIds || [],
+                    uploads: data.uploads || [],
                 };
 
                 // Check if link is expired
@@ -107,8 +117,113 @@ function PaymentPage() {
         fetchPaymentLink();
     }, [reference]);
 
+    // Fetch crypto conversion when a crypto payment method is selected
+    useEffect(() => {
+        const fetchCryptoConversion = async () => {
+            if (!selectedMethod || !paymentLink) return;
+
+            const selectedPaymentMethod = paymentMethods.find(m => m.id === selectedMethod);
+            if (!selectedPaymentMethod || selectedPaymentMethod.type !== 'crypto') return;
+
+            const cryptoType = selectedPaymentMethod.details.cryptoType;
+            if (!cryptoType) return;
+
+            // Set loading state
+            setCryptoConversions(prev => ({
+                ...prev,
+                [selectedMethod]: { ...prev[selectedMethod], loading: true }
+            }));
+
+            try {
+                const conversion = await convertToCrypto(
+                    paymentLink.amount,
+                    paymentLink.currency,
+                    cryptoType
+                );
+
+                if (conversion) {
+                    setCryptoConversions(prev => ({
+                        ...prev,
+                        [selectedMethod]: {
+                            amount: conversion.cryptoAmount,
+                            rate: conversion.rate,
+                            loading: false
+                        }
+                    }));
+                } else {
+                    setCryptoConversions(prev => ({
+                        ...prev,
+                        [selectedMethod]: { amount: 0, rate: 0, loading: false }
+                    }));
+                }
+            } catch (err) {
+                console.error('Error fetching crypto conversion:', err);
+                setCryptoConversions(prev => ({
+                    ...prev,
+                    [selectedMethod]: { amount: 0, rate: 0, loading: false }
+                }));
+            }
+        };
+
+        fetchCryptoConversion();
+    }, [selectedMethod, paymentLink, paymentMethods]);
+
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
+    };
+
+    const handlePaymentConfirmation = async (file: File) => {
+        if (!paymentLinkDocId || !paymentLink || !selectedMethod) {
+            throw new Error("Missing required data for payment confirmation");
+        }
+
+        try {
+            // Upload file to Firebase Storage
+            const timestamp = Date.now();
+            const fileName = `${paymentLink.reference}_${timestamp}_${file.name}`;
+            const storageRef = ref(storage, `payment-proofs/${paymentLink.reference}/${fileName}`);
+            
+            await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(storageRef);
+
+            // Get selected payment method name
+            const selectedPaymentMethod = paymentMethods.find(m => m.id === selectedMethod);
+            const paymentMethodName = selectedPaymentMethod?.name || "Unknown";
+
+            // Update payment link document
+            const paymentLinkRef = doc(db, "payment_links", paymentLinkDocId);
+            
+            const newUpload = {
+                url: downloadURL,
+                fileName: file.name,
+                uploadedAt: new Date(),
+            };
+
+            const newTimelineEvent = {
+                title: `Payment proof submitted via ${paymentMethodName}`,
+                date: formatDate(new Date()),
+            };
+
+            await updateDoc(paymentLinkRef, {
+                status: 'pending',
+                uploads: [...(paymentLink.uploads || []), newUpload],
+                timeline: [...(paymentLink.timeline || []), newTimelineEvent],
+                updatedAt: serverTimestamp(),
+            });
+
+            // Update local state
+            setPaymentLink({
+                ...paymentLink,
+                status: 'pending',
+                uploads: [...(paymentLink.uploads || []), newUpload],
+                timeline: [...(paymentLink.timeline || []), newTimelineEvent],
+            });
+
+            alert("Payment proof submitted successfully! The merchant will review your payment shortly.");
+        } catch (error) {
+            console.error("Error submitting payment proof:", error);
+            throw error;
+        }
     };
 
     if (loading) {
@@ -275,6 +390,35 @@ function PaymentPage() {
 
                                                 {method.type === 'crypto' && (
                                                     <>
+                                                        {/* Crypto Conversion Amount */}
+                                                        {cryptoConversions[method.id || ''] && (
+                                                            <div className="mb-3 p-3 bg-primary/[0.05] rounded-lg border border-primary/20">
+                                                                {cryptoConversions[method.id || ''].loading ? (
+                                                                    <div className="flex items-center justify-center gap-2">
+                                                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                                                                        <span className="text-sm text-gray-600">Converting...</span>
+                                                                    </div>
+                                                                ) : cryptoConversions[method.id || ''].amount > 0 ? (
+                                                                    <div className="flex items-center justify-between">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <CurrencyCircleDollarIcon size={20} className="text-primary" />
+                                                                            <span className="text-sm text-gray-600">Amount to Pay:</span>
+                                                                        </div>
+                                                                        <div className="text-right">
+                                                                            <p className="text-lg font-bold text-primary">
+                                                                                {formatCryptoAmount(cryptoConversions[method.id || ''].amount, method.details.cryptoType)} {getCryptoSymbol(method.details.cryptoType)}
+                                                                            </p>
+                                                                            <p className="text-xs text-gray-500">
+                                                                                Rate: 1 {method.details.cryptoType} = {formatCurrency(cryptoConversions[method.id || ''].rate, paymentLink.currency)}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                ) : (
+                                                                    <p className="text-sm text-red-600 text-center">Unable to fetch conversion rate</p>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                        
                                                         <div className="flex justify-between text-sm">
                                                             <span className="text-gray-600">Cryptocurrency:</span>
                                                             <span className="font-medium">{method.details.cryptoType}</span>
@@ -347,13 +491,10 @@ function PaymentPage() {
                         )}
 
                         {/* Confirm Payment Button */}
-                        {paymentMethods.length > 0 && !error && (
+                        {paymentMethods.length > 0 && !error && paymentLink.status === 'active' && (
                             <div className="mt-6">
                                 <Button
-                                    onClick={() => {
-                                        // Handle payment confirmation
-                                        alert('Payment confirmation functionality would be implemented here');
-                                    }}
+                                    onClick={() => setIsConfirmModalOpen(true)}
                                     disabled={!selectedMethod}
                                     className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
@@ -361,9 +502,33 @@ function PaymentPage() {
                                 </Button>
                             </div>
                         )}
+
+                        {/* Payment Submitted Message */}
+                        {paymentLink.status === 'pending' && (
+                            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                                <div className="flex items-start gap-3">
+                                    <CheckCircleIcon size={24} className="text-green-600 mt-0.5" />
+                                    <div>
+                                        <h4 className="font-semibold text-green-900 mb-1">Payment Submitted</h4>
+                                        <p className="text-sm text-green-700">
+                                            Your payment proof has been submitted and is awaiting merchant verification.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
+
+            {/* Payment Confirmation Modal */}
+            <PaymentConfirmationModal
+                isOpen={isConfirmModalOpen}
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={handlePaymentConfirmation}
+                paymentAmount={formatCurrency(paymentLink.amount, paymentLink.currency)}
+                paymentMethod={paymentMethods.find(m => m.id === selectedMethod)?.name || ""}
+            />
         </div>
     );
 }
