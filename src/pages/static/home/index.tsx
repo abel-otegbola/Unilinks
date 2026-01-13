@@ -86,10 +86,14 @@ export default function Homepage() {
               <p>Your transactions are protected with AES-256 encryption, secure Firebase authentication, and automated fraud detection. We never store sensitive payment credentials.</p>
             </div>
           </div>
-          <div className="flex md:flex-nowrap flex-wrap w-full gap-4 bg-primary/[0.08] rounded-lg p-6 h-[400px]">
+          <div className="relative flex md:flex-nowrap flex-wrap w-full gap-8 bg-primary/[0.08] rounded-lg p-6 pb-0 md:h-[400px]">
             <div className="flex flex-col justify-center gap-8 md:w-[30%]">
               <h3 className="font-semibold text-lg">Complete Payment Visibility</h3>
               <p>Professional dashboard with comprehensive analytics. Track payment status, view transaction history, manage expiration dates, and receive instant notifications the moment you get paid.</p>
+            </div>
+            <div className=" flex-1 flex items-end h-full justify-center">
+              <img src="/why-bg.png" width={500} height={300} className="object-cover md:w-[500px] w-full" />
+              <div className="absolute bottom-0 left-0 w-full h-[90px] bg-gradient-to-t from-primary/[0.1] via-primary/[0.08] rounded-b-lg"></div>
             </div>
           </div>
       </section>
