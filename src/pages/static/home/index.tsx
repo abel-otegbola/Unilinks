@@ -70,7 +70,7 @@ export default function Homepage() {
       </section>
 
       <section className="flex flex-col gap-10 lg:p-[6%] md:p-[3%] p-4 mb-12">
-          <div className="flex flex-col justify-center items-center gap-4 mb-10">
+          <div className="flex flex-col justify-center md:items-center gap-4 mb-10">
             <p className="font-medium text-primary uppercase">Why us</p>
             <h2 className="text-[42px] font-medium leading-[110%]">Why they prefer Unilinks</h2>
           </div>
