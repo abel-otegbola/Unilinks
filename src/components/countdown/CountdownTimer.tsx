@@ -75,7 +75,7 @@ export default function CountdownTimer({ expiresAt, onExpired, className = "" }:
   }
 
   return (
-    <div className={`flex items-center gap-2 text-xs text-gray-500 bg-primary/[0.1] rounded border border-primary p-[2px] ${className}`}>
+    <div className={`flex items-center gap-2 text-xs text-gray-500 ${className}`}>
       {timeRemaining.days > 0 && (
         <div className="flex flex-col items-center bg-gray-100 rounded px-2 py-1">
           <span className="text-sm font-bold text-gray-900">{timeRemaining.days}</span>
@@ -84,14 +84,17 @@ export default function CountdownTimer({ expiresAt, onExpired, className = "" }:
       )}
       <div className="flex flex-col items-center bg-gray-100 rounded px-2 py-1">
         <span className="text-sm font-bold text-gray-900">{String(timeRemaining.hours).padStart(2, '0')}</span>
+        <span className="text-[10px] text-gray-500">hrs</span>
       </div>
       <span className="text-gray-400">:</span>
       <div className="flex flex-col items-center bg-gray-100 rounded px-2 py-1">
         <span className="text-sm font-bold text-gray-900">{String(timeRemaining.minutes).padStart(2, '0')}</span>
+        <span className="text-[10px] text-gray-500">min</span>
       </div>
       <span className="text-gray-400">:</span>
       <div className="flex flex-col items-center bg-gray-100 rounded px-2 py-1">
         <span className="text-sm font-bold text-gray-900">{String(timeRemaining.seconds).padStart(2, '0')}</span>
+        <span className="text-[10px] text-gray-500">sec</span>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { CardsIcon, DownloadSimpleIcon, QrCodeIcon, PencilIcon, TrashIcon, CheckCircleIcon, FacebookLogo, WhatsappLogo, TwitterLogo, LinkedinLogo, TelegramLogo, ShareNetworkIcon } from "@phosphor-icons/react";
+import { CardsIcon, DownloadSimpleIcon, QrCodeIcon, PencilIcon, TrashIcon, CheckCircleIcon, FacebookLogoIcon, WhatsappLogoIcon, TwitterLogoIcon, LinkedinLogoIcon, TelegramLogoIcon, ShareNetworkIcon } from "@phosphor-icons/react";
 import { useContext, useMemo, useRef, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, updateDoc } from "firebase/firestore";
@@ -239,16 +239,18 @@ function SingleLinkPage() {
                         {paymentLink.status}
                         </span>
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between py-1">
                         <p className="opacity-[0.7]">Created</p>
                         <p className="text-sm font-medium mt-1">{formatDate(paymentLink.createdAt)} at {paymentLink.createdAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>
                     </div>
                     <div className="flex items-center justify-between">
                         <p className="opacity-[0.7]">Expires</p>
-                        <div className="flex items-center gap-1">
-                            <CountdownTimer expiresAt={paymentLink.expiresAt} />
+                        <div className="">
                             <p className="">{formatDate(paymentLink.expiresAt)} at {paymentLink.expiresAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>
                         </div>
+                    </div>
+                    <div className="flex items-center justify-end">
+                        <CountdownTimer expiresAt={paymentLink.expiresAt} />
                     </div>
                 </div>
 
@@ -412,7 +414,7 @@ function SingleLinkPage() {
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2 p-2 bg-[#1877F2] text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
                             >
-                                <FacebookLogo size={20} weight="fill" />
+                                <FacebookLogoIcon size={20} weight="fill" />
                             </a>
                             <a
                                 href={`https://wa.me/?text=${encodeURIComponent(`Payment Link: ${paymentLink.link}`)}`}
@@ -420,7 +422,7 @@ function SingleLinkPage() {
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2 p-2 bg-[#25D366] text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
                             >
-                                <WhatsappLogo size={20} weight="fill" />
+                                <WhatsappLogoIcon size={20} weight="fill" />
                             </a>
                             <a
                                 href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(paymentLink.link)}&text=${encodeURIComponent('Payment Link')}`}
@@ -428,7 +430,7 @@ function SingleLinkPage() {
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2 p-2 bg-[#1DA1F2] text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
                             >
-                                <TwitterLogo size={20} weight="fill" />
+                                <TwitterLogoIcon size={20} weight="fill" />
                             </a>
                             <a
                                 href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(paymentLink.link)}`}
@@ -436,7 +438,7 @@ function SingleLinkPage() {
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2 p-2 bg-[#0A66C2] text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
                             >
-                                <LinkedinLogo size={20} weight="fill" />
+                                <LinkedinLogoIcon size={20} weight="fill" />
                             </a>
                             <a
                                 href={`https://t.me/share/url?url=${encodeURIComponent(paymentLink.link)}&text=${encodeURIComponent('Payment Link')}`}
@@ -444,7 +446,7 @@ function SingleLinkPage() {
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2 p-2 bg-[#0088cc] text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
                             >
-                                <TelegramLogo size={20} weight="fill" />
+                                <TelegramLogoIcon size={20} weight="fill" />
                             </a>
                         </div>
                     </div>
