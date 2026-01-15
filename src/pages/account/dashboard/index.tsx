@@ -31,7 +31,9 @@ function Dashboard() {
                     <div className="flex flex-col">
                       <div className="flex gap-2 justify-end flex-wrap flex-col">
                         <p className="xl:text-5xl md:text-4xl sm:text-3xl text-2xl font-semibold">{paymentLinks?.length || 0}</p>
-                        <p className="border border-green-400 bg-green-400/[0.2] text-green-600 w-fit p-2 py-2 mb-2 leading-0 rounded text-[10px]">+5%</p>
+                        <p className="border border-green-400 bg-green-400/[0.2] text-green-600 w-fit p-2 py-2 mb-2 leading-0 rounded text-[10px]">
+                          {paymentLinks?.length > 0 ? Math.round((paymentLinks.filter(l => l.status === 'completed').length / paymentLinks.length) * 100) : 0}% completed
+                        </p>
                       </div>
                       <p className="text-sm text-gray-500">Total links created</p>
                     </div>
@@ -42,7 +44,9 @@ function Dashboard() {
                     <div className="flex flex-col">
                       <div className="flex gap-2 justify-end flex-wrap flex-col">
                         <p className="xl:text-5xl md:text-4xl sm:text-3xl text-2xl font-semibold">{paymentLinks?.filter(l => l.status === 'active').length || 0}</p>
-                        <p className="border border-green-400 bg-green-400/[0.2] text-green-600 w-fit p-2 py-2 mb-2 leading-0 rounded text-[10px]">+5%</p>
+                        <p className="border border-blue-400 bg-blue-400/[0.2] text-blue-600 w-fit p-2 py-2 mb-2 leading-0 rounded text-[10px]">
+                          {paymentLinks?.length > 0 ? Math.round((paymentLinks.filter(l => l.status === 'active').length / paymentLinks.length) * 100) : 0}% of total
+                        </p>
                       </div>
                       <p className="text-sm text-gray-500">Total active links</p>
                     </div>
@@ -53,7 +57,9 @@ function Dashboard() {
                     <div className="flex flex-col">
                       <div className="flex gap-2 justify-end flex-wrap flex-col">
                         <p className="xl:text-5xl md:text-4xl sm:text-3xl text-2xl font-semibold">{paymentLinks?.filter(l => l.status === 'expired').length || 0}</p>
-                        <p className="border border-green-400 bg-green-400/[0.2] text-green-600 w-fit p-2 py-2 mb-2 leading-0 rounded text-[10px]">+5%</p>
+                        <p className="border border-red-400 bg-red-400/[0.2] text-red-600 w-fit p-2 py-2 mb-2 leading-0 rounded text-[10px]">
+                          {paymentLinks?.length > 0 ? Math.round((paymentLinks.filter(l => l.status === 'expired').length / paymentLinks.length) * 100) : 0}% of total
+                        </p>
                       </div>
                       <p className="text-sm text-gray-500">Total expired links</p>
                     </div>
@@ -63,8 +69,8 @@ function Dashboard() {
                     <h2 className="font-semibold">Total Revenue</h2>
                     <div className="flex flex-col">
                       <div className="flex gap-2 justify-end flex-wrap flex-col">
-                        <p className="xl:text-5xl md:text-4xl sm:text-3xl text-2xl font-semibold">{formatCurrency(paymentLinks?.reduce((total, link) => total + link.amount, 0) || 0, "USD")}</p>
-                        <p className="border border-green-400 bg-green-400/[0.2] text-green-600 w-fit p-2 py-2 mb-2 leading-0 rounded text-[10px]">+5%</p>
+                        <p className="xl:text-5xl md:text-4xl sm:text-3xl text-2xl font-semibold">{formatCurrency(paymentLinks?.filter(l => l.status === 'completed').reduce((total, link) => total + link.amount, 0) || 0, "USD")}</p>
+                        <p className="border border-green-400 bg-green-400/[0.2] text-green-600 w-fit p-2 py-2 mb-2 leading-0 rounded text-[10px]">{paymentLinks?.filter(l => l.status === 'completed').length || 0} completed</p>
                       </div>
                       <p className="text-sm text-gray-500">Total revenue generated</p>
                     </div>

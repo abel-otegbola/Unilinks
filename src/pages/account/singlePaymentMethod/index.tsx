@@ -1,18 +1,25 @@
-import { CreditCardIcon, CheckCircleIcon } from "@phosphor-icons/react";
-import { useContext, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { CreditCardIcon, CheckCircleIcon, PencilIcon, TrashIcon } from "@phosphor-icons/react";
+import { useContext, useMemo, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { PaymentContext } from "../../../contexts/PaymentContext";
 import { PaymentLinkContext } from "../../../contexts/PaymentLinkContext";
+import type { PaymentMethod } from "../../../interface/payments";
 import { getStatusColor } from "../../../utils/helpers/getStatusColor";
 import { formatDate } from "../../../utils/helpers/formatDate";
 import { formatCurrency } from "../../../utils/helpers/formatCurrency";
 import { Link } from "react-router-dom";
+import Button from "../../../components/button/Button";
+import EditPaymentMethodModal from "../../../components/modal/EditPaymentMethodModal";
 
 function SinglePaymentMethodPage() {
     const { id } = useParams<{ id: string }>();
-    const { getPaymentMethodById } = useContext(PaymentContext);
+    const navigate = useNavigate();
+    const { getPaymentMethodById, updatePaymentMethod, deletePaymentMethod } = useContext(PaymentContext);
     const { paymentLinks } = useContext(PaymentLinkContext);
     const paymentMethod = useMemo(() => getPaymentMethodById(id || ""), [id, getPaymentMethodById]);
+    
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     // Get payment links that use this payment method
     const linkedPaymentLinks = useMemo(() => {
@@ -21,6 +28,43 @@ function SinglePaymentMethodPage() {
             link.paymentMethodIds?.includes(paymentMethod.id || "")
         );
     }, [paymentMethod, paymentLinks]);
+
+    const handleEditPaymentMethod = async (id: string, updatedMethod: PaymentMethod) => {
+        try {
+            await updatePaymentMethod(id, {
+                name: updatedMethod.name,
+                type: updatedMethod.type,
+                status: updatedMethod.status,
+                details: updatedMethod.details,
+                userId: updatedMethod.userId,
+            });
+            setIsEditModalOpen(false);
+        } catch (error) {
+            console.error('Error updating payment method:', error);
+            alert('Failed to update payment method');
+        }
+    };
+
+    const handleDeletePaymentMethod = async () => {
+        if (!paymentMethod?.id) return;
+        
+        const confirmed = window.confirm(
+            'Are you sure you want to delete this payment method? This action cannot be undone.'
+        );
+        
+        if (!confirmed) return;
+        
+        try {
+            setIsDeleting(true);
+            await deletePaymentMethod(paymentMethod.id);
+            navigate('/account/payment-methods');
+        } catch (error) {
+            console.error('Error deleting payment method:', error);
+            alert('Failed to delete payment method');
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
     if (!paymentMethod) {
         return (
@@ -40,6 +84,29 @@ function SinglePaymentMethodPage() {
                     <span className={`px-3 py-1 text-sm font-medium rounded-full border ${getStatusColor(paymentMethod.status)}`}>
                         {paymentMethod.status}
                     </span>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-3 flex-wrap">
+                    <Button
+                        variant="secondary"
+                        size="small"
+                        onClick={() => setIsEditModalOpen(true)}
+                    >
+                        <PencilIcon size={16} />
+                        Edit Method
+                    </Button>
+                    
+                    <Button
+                        variant="secondary"
+                        size="small"
+                        onClick={handleDeletePaymentMethod}
+                        disabled={isDeleting}
+                        className="!text-red-600 !border-red-600 hover:!bg-red-50"
+                    >
+                        <TrashIcon size={16} />
+                        {isDeleting ? 'Deleting...' : 'Delete'}
+                    </Button>
                 </div>
 
                 <div className="flex items-center gap-2 md:p-6 p-4 rounded-lg bg-primary/[0.08] border border-gray-500/[0.1]">
@@ -163,6 +230,14 @@ function SinglePaymentMethodPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Edit Payment Method Modal */}
+            <EditPaymentMethodModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                onEdit={handleEditPaymentMethod}
+                paymentMethod={paymentMethod}
+            />
         </div>
     );
 }
