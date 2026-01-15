@@ -120,7 +120,7 @@ function SingleLinkPage() {
         try {
             setIsDeleting(true);
             await deletePaymentLink(paymentLink.id);
-            navigate('/account/links');
+            navigate('/account/payment-links');
         } catch (error) {
             console.error('Error deleting payment link:', error);
             alert('Failed to delete payment link');
