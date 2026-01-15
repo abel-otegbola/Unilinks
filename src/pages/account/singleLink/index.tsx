@@ -1,4 +1,4 @@
-import { CardsIcon, DownloadSimpleIcon, QrCodeIcon, PencilIcon, TrashIcon, CheckCircleIcon } from "@phosphor-icons/react";
+import { CardsIcon, DownloadSimpleIcon, QrCodeIcon, PencilIcon, TrashIcon, CheckCircleIcon, FacebookLogo, WhatsappLogo, TwitterLogo, LinkedinLogo, TelegramLogo, ShareNetworkIcon } from "@phosphor-icons/react";
 import { useContext, useMemo, useRef, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, updateDoc } from "firebase/firestore";
@@ -394,6 +394,59 @@ function SingleLinkPage() {
                             <DownloadSimpleIcon size={18} />
                             Download as PDF
                         </Button>
+                    </div>
+                </div>
+
+                {/* Share Box */}
+                <div className="border border-gray-500/[0.1] rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-2 border-b border-gray-500/[0.1] pb-2">
+                        <ShareNetworkIcon size={16} />
+                        <p className="font-semibold">Share Link</p>
+                    </div>
+                    <div className="py-4">
+                        <p className="text-xs text-gray-500 mb-3">Share this payment link via social media</p>
+                        <div className="flex items-center gap-2">
+                            <a
+                                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(paymentLink.link)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 p-2 bg-[#1877F2] text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
+                            >
+                                <FacebookLogo size={20} weight="fill" />
+                            </a>
+                            <a
+                                href={`https://wa.me/?text=${encodeURIComponent(`Payment Link: ${paymentLink.link}`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 p-2 bg-[#25D366] text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
+                            >
+                                <WhatsappLogo size={20} weight="fill" />
+                            </a>
+                            <a
+                                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(paymentLink.link)}&text=${encodeURIComponent('Payment Link')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 p-2 bg-[#1DA1F2] text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
+                            >
+                                <TwitterLogo size={20} weight="fill" />
+                            </a>
+                            <a
+                                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(paymentLink.link)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 p-2 bg-[#0A66C2] text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
+                            >
+                                <LinkedinLogo size={20} weight="fill" />
+                            </a>
+                            <a
+                                href={`https://t.me/share/url?url=${encodeURIComponent(paymentLink.link)}&text=${encodeURIComponent('Payment Link')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 p-2 bg-[#0088cc] text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
+                            >
+                                <TelegramLogo size={20} weight="fill" />
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
