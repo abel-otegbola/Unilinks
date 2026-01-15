@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { BookOpenIcon, LinkIcon, CreditCardIcon, QrCodeIcon, ChartBarIcon } from "@phosphor-icons/react";
+import { BookOpenIcon, LinkIcon, CreditCardIcon, QrCodeIcon, ChartBarIcon, ListIcon, XIcon } from "@phosphor-icons/react";
 import Button from "../../../components/button/Button";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { useContext, useState, useEffect, useMemo } from "react";
 
 function DocsPage() {
   const { user } = useContext(AuthContext);
-    const isOpen = true; // Sidebar is always open on docs page
+    const [ isOpen, setIsOpen ] = useState(true); // Sidebar is always open on docs page
     const [ currentPath, setCurrentPath ] = useState("getting-started");
 
     const navBarLinks = useMemo(() => [
@@ -60,8 +60,10 @@ function DocsPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="flex justify-between items-center lg:px-[6%] md:px-[3%] p-4">
-        <img src="/logo.svg" alt="UniLinks logo" width={64} height={32} className="sm:ml-0 ml-1" />
+      <header className="flex justify-between items-center sticky top-0 left-0 lg:px-[6%] md:px-[3%] p-4 bg-white border-b border-gray-500/[0.1]">
+        <div className="flex items-center gap-2 sm:ml-0 ml-12">
+            <img src="/logo.svg" alt="UniLinks logo" width={64} height={32} className="sm:ml-0 ml-1" />
+        </div>
 
         {user ? (
         <Link to="/account">
@@ -74,11 +76,15 @@ function DocsPage() {
 
     <div className="flex sm:flex-row flex-col gap-6 lg:px-[5%] md:px-[3%] p-4">
         <aside
-            className={`fixed lg:sticky top-4 md:bg-none h-[calc(100vh-100px)] bg-gray-50 p-2 inset-y-0 rounded-[12px] left-0 z-30 w-64 transform transition-transform duration-300 ease-in-out ${
-                isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+            className={`fixed sm:sticky sm:top-20 sm:bg-none sm:h-[calc(100vh-100px)] bg-white sm:border-none border-r border-gray-500/[0.1] h-full p-2 inset-y-0 sm:rounded-[12px] left-0 z-30 w-64 transform transition-transform duration-300 ease-in-out ${
+                isOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0"
             }`}
             >
-            <nav className="space-y-1">
+                
+            <button className={`p-2 absolute top-4 bg-white sm:hidden rounded-r-[12px] ${isOpen ? "border border-gray-500/[0.1] -right-[41.5px]" : " -right-[52px]"}`} onClick={() => setIsOpen(!isOpen)}>
+                { isOpen ? <XIcon size={24} /> : <ListIcon size={24} /> }
+            </button>
+            <nav className="space-y-1 bg-gray-50 h-[100%] overflow-y-auto p-4 border border-gray-500/[0.1] rounded-lg">
                 {
                 navBarLinks.map((link) => (
                     <button
@@ -97,7 +103,7 @@ function DocsPage() {
                 }
             </nav>
         </aside>
-        <div className="sm:w-3/4 w-full p-6">
+        <div className="sm:w-3/4 w-full sm:p-6">
         {/* Hero Section */}
             <section className="py-12">
                 <div className="">
