@@ -52,6 +52,7 @@ export default function EditPaymentLinkModal({ isOpen, onClose, paymentLink }: E
           notes: values.notes,
           paymentMethodIds: values.paymentMethodIds,
           userId: paymentLink.userId,
+          status: 'active',
         });
         onClose();
       } catch (error) {

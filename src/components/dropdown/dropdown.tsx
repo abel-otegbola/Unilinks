@@ -49,6 +49,7 @@ export default function Dropdown({ className, disabled, label, name, options, va
                     onBlur={() => setFocus(false)}
                     onChange={(e) => {onChange(e.target.value)}}
                 >
+                  <option value="" className="text-black/[0.5]">Select one</option>
                   {
                     options?.map(option => (
                       <option className="p-4 h-[40px] bg-white" key={option.id} value={option.id}>{option.title}</option>

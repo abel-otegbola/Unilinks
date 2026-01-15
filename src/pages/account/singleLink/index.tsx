@@ -1,8 +1,10 @@
-import { CardsIcon, DownloadSimpleIcon, QrCodeIcon } from "@phosphor-icons/react";
-import { useContext, useMemo, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { CardsIcon, DownloadSimpleIcon, QrCodeIcon, PencilIcon, TrashIcon, CheckCircleIcon } from "@phosphor-icons/react";
+import { useContext, useMemo, useRef, useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../../firebase/firebase";
 import QRCode from "qrcode";
-import jsPDF from "jspdf";
+import { downloadQRCodeAsPDF } from "../../../utils/helpers/downloadQRCodePDF";
 import { PaymentLinkContext } from "../../../contexts/PaymentLinkContext";
 import { PaymentContext } from "../../../contexts/PaymentContext";
 import { copyToClipboard } from "../../../utils/helpers/copyToClipboard";
@@ -11,13 +13,20 @@ import Input from "../../../components/input/input";
 import { formatCurrency } from "../../../utils/helpers/formatCurrency";
 import { getStatusColor } from "../../../utils/helpers/getStatusColor";
 import { formatDate } from "../../../utils/helpers/formatDate";
+import EditPaymentLinkModal from "../../../components/modal/EditPaymentLinkModal";
+import CountdownTimer from "../../../components/countdown/CountdownTimer";
 
 function SingleLinkPage() {
     const { id } = useParams<{ id: string }>();
-    const { getPaymentLinkById } = useContext(PaymentLinkContext);
+    const navigate = useNavigate();
+    const { getPaymentLinkById, deletePaymentLink, addTimelineEvent } = useContext(PaymentLinkContext);
     const { paymentMethods } = useContext(PaymentContext);
     const paymentLink = useMemo(() => getPaymentLinkById(id || ""), [id, getPaymentLinkById]);
     const qrCodeCanvasRef = useRef<HTMLCanvasElement>(null);
+    
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isCompletingPayment, setIsCompletingPayment] = useState(false);
 
     // Get payment methods for this link
     const linkPaymentMethods = useMemo(() => {
@@ -26,6 +35,38 @@ function SingleLinkPage() {
             paymentLink.paymentMethodIds?.includes(method.id || "")
         );
     }, [paymentLink, paymentMethods]);
+
+    // Check if link has expired and update status
+    useEffect(() => {
+        const checkExpiration = async () => {
+            if (!paymentLink?.id || !paymentLink.expiresAt) return;
+            
+            const now = new Date();
+            const expiryDate = paymentLink.expiresAt;
+            
+            // Check if link has expired and status is still active or pending
+            if (expiryDate < now && (paymentLink.status === 'active' || paymentLink.status === 'pending')) {
+                try {
+                    const linkRef = doc(db, "payment_links", paymentLink.id);
+                    await updateDoc(linkRef, {
+                        status: 'expired',
+                    });
+                    
+                    // Add timeline event for expiration
+                    await addTimelineEvent(paymentLink.id, {
+                        title: 'Payment link expired',
+                        date: new Date().toLocaleString(),
+                    });
+                    
+                    console.log('Payment link marked as expired');
+                } catch (error) {
+                    console.error('Error updating expired status:', error);
+                }
+            }
+        };
+
+        checkExpiration();
+    }, [paymentLink, addTimelineEvent]);
 
     // Generate QR Code
     useEffect(() => {
@@ -48,63 +89,60 @@ function SingleLinkPage() {
         }
     }, [paymentLink]);
 
-    const downloadQRCodeAsPDF = async () => {
+    const handleDownloadQRCode = async () => {
         if (!paymentLink || !qrCodeCanvasRef.current) return;
 
         try {
-            // Generate QR code as data URL
-            const qrDataUrl = qrCodeCanvasRef.current.toDataURL('image/png');
-
-            // Create PDF
-            const pdf = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4',
+            await downloadQRCodeAsPDF(qrCodeCanvasRef.current, {
+                reference: paymentLink.reference,
+                amount: paymentLink.amount,
+                currency: paymentLink.currency,
+                link: paymentLink.link,
             });
-
-            // Add title
-            pdf.setFontSize(20);
-            pdf.text('Payment Link QR Code', 105, 20, { align: 'center' });
-
-            // Add reference
-            pdf.setFontSize(12);
-            pdf.text(`Reference: ${paymentLink.reference}`, 105, 30, { align: 'center' });
-
-            // Add amount
-            pdf.setFontSize(14);
-            pdf.text(
-                `Amount: ${formatCurrency(paymentLink.amount, paymentLink.currency)}`,
-                105,
-                40,
-                { align: 'center' }
-            );
-
-            // Add QR code (centered)
-            const qrSize = 100;
-            const xPos = (210 - qrSize) / 2; // Center on A4 width (210mm)
-            pdf.addImage(qrDataUrl, 'PNG', xPos, 50, qrSize, qrSize);
-
-            // Add link text below QR code
-            pdf.setFontSize(10);
-            pdf.text('Scan to pay or visit:', 105, 160, { align: 'center' });
-            pdf.setFontSize(9);
-            pdf.text(paymentLink.link, 105, 167, { align: 'center' });
-
-            // Add footer
-            pdf.setFontSize(8);
-            pdf.setTextColor(128);
-            pdf.text(
-                `Generated on ${formatDate(new Date())}`,
-                105,
-                280,
-                { align: 'center' }
-            );
-
-            // Save PDF
-            pdf.save(`payment-link-${paymentLink.reference}.pdf`);
-        } catch (error) {
-            console.error('Error generating PDF:', error);
+        } catch {
             alert('Failed to generate PDF');
+        }
+    };
+
+    const handleCloseEditModal = () => {
+        setIsEditModalOpen(false);
+    };
+
+    const handleDeletePaymentLink = async () => {
+        if (!paymentLink?.id) return;
+        
+        const confirmed = window.confirm(
+            'Are you sure you want to delete this payment link? This action cannot be undone.'
+        );
+        
+        if (!confirmed) return;
+        
+        try {
+            setIsDeleting(true);
+            await deletePaymentLink(paymentLink.id);
+            navigate('/account/links');
+        } catch (error) {
+            console.error('Error deleting payment link:', error);
+            alert('Failed to delete payment link');
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const handleCompletePayment = async () => {
+        setIsCompletingPayment(true);
+        if (!paymentLink?.id) return;
+        try {
+            // Update the payment link with completed status
+            const linkRef = doc(db, "payment_links", paymentLink.id);
+            await updateDoc(linkRef, {
+                status: 'completed',
+            });
+        } catch (error) {
+            console.error('Error completing payment:', error);
+            alert('Failed to complete payment');
+        } finally {
+            setIsCompletingPayment(false);
         }
     };
 
@@ -125,6 +163,40 @@ function SingleLinkPage() {
                 <div className="flex items-center justify-between gap-4 flex-wrap py-4 border-b border-gray-500/[0.1]">
                     <h1 className="md:text-[18px] text-[16px] font-medium capitalize leading-[28px]">Payment link</h1>
                     <p> #{paymentLink.reference}</p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-3 flex-wrap">
+                    <Button
+                        variant="secondary"
+                        size="small"
+                        onClick={() => setIsEditModalOpen(true)}
+                        disabled={paymentLink.status === 'completed' || paymentLink.status === 'cancelled'}
+                    >
+                        <PencilIcon size={16} />
+                        Edit Link
+                    </Button>
+                    
+                    <Button
+                        variant="secondary"
+                        size="small"
+                        onClick={handleCompletePayment}
+                        disabled={paymentLink.status === 'completed' || paymentLink.status === 'cancelled' || isCompletingPayment}
+                    >
+                        <CheckCircleIcon size={16} />
+                        {isCompletingPayment ? 'Processing...' : 'Complete Payment'}
+                    </Button>
+                    
+                    <Button
+                        variant="secondary"
+                        size="small"
+                        onClick={handleDeletePaymentLink}
+                        disabled={isDeleting}
+                        className="!text-red-600 !border-red-600 hover:!bg-red-50"
+                    >
+                        <TrashIcon size={16} />
+                        {isDeleting ? 'Deleting...' : 'Delete'}
+                    </Button>
                 </div>
 
                 <div className="flex items-center gap-2 md:p-6 p-4 rounded-lg bg-primary/[0.08] border border-gray-500/[0.1]">
@@ -169,11 +241,14 @@ function SingleLinkPage() {
                     </div>
                     <div className="flex items-center justify-between">
                         <p className="opacity-[0.7]">Created</p>
-                        <p className="text-sm font-medium mt-1">{formatDate(paymentLink.createdAt)}</p>
+                        <p className="text-sm font-medium mt-1">{formatDate(paymentLink.createdAt)} at {paymentLink.createdAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>
                     </div>
                     <div className="flex items-center justify-between">
                         <p className="opacity-[0.7]">Expires</p>
-                        <p className="text-sm font-medium mt-1">{formatDate(paymentLink.expiresAt)}</p>
+                        <div className="flex items-center gap-1">
+                            <CountdownTimer expiresAt={paymentLink.expiresAt} />
+                            <p className="">{formatDate(paymentLink.expiresAt)} at {paymentLink.expiresAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>
+                        </div>
                     </div>
                 </div>
 
@@ -312,7 +387,7 @@ function SingleLinkPage() {
 
                         {/* Download Button */}
                         <Button
-                            onClick={downloadQRCodeAsPDF}
+                            onClick={handleDownloadQRCode}
                             className="w-full flex items-center justify-center gap-2"
                             variant="secondary"
                         >
@@ -322,6 +397,13 @@ function SingleLinkPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Edit Payment Link Modal */}
+            <EditPaymentLinkModal
+                isOpen={isEditModalOpen}
+                onClose={handleCloseEditModal}
+                paymentLink={paymentLink}
+            />
         </div>
     )
 }

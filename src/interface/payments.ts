@@ -50,6 +50,7 @@ export interface PaymentLinkInput {
   notes?: string;
   userId: string;
   paymentMethodIds?: string[];
+  status?: string
 }
 
 export interface TimelineEvent {

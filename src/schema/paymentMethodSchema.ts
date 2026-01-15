@@ -53,6 +53,21 @@ export const paypalPaymentMethodSchema = Yup.object().shape({
     .required("PayPal email is required")
     .email("Invalid email format")
     .trim(),
+  paypalAccountType: Yup.string()
+    .required("Account type is required")
+    .oneOf(["personal", "business"], "Invalid account type"),
+  paypalBusinessName: Yup.string().when("paypalAccountType", {
+    is: "business",
+    then: (schema) => schema.required("Business name is required").trim(),
+    otherwise: (schema) => schema.optional(),
+  }),
+  paypalMeUsername: Yup.string().optional().trim(),
+  paypalCountry: Yup.string()
+    .required("Country is required")
+    .trim(),
+  paypalCurrency: Yup.string()
+    .required("Primary currency is required")
+    .oneOf(["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "INR"], "Invalid currency"),
 });
 
 // Stripe-specific schema
@@ -60,9 +75,23 @@ export const stripePaymentMethodSchema = Yup.object().shape({
   ...basePaymentMethodSchema,
   paymentType: Yup.string().equals(["stripe"]),
   stripeAccountId: Yup.string()
-    .required("Stripe account ID is required")
+    .required("Stripe account ID or publishable key is required")
+    .trim(),
+  stripeAccountType: Yup.string()
+    .required("Account type is required")
+    .oneOf(["standard", "express", "custom"], "Invalid account type"),
+  stripeDisplayName: Yup.string()
+    .required("Display name is required")
     .trim()
-    .matches(/^acct_/, "Invalid Stripe account ID format"),
+    .min(2, "Display name must be at least 2 characters"),
+  stripeCountry: Yup.string()
+    .required("Country is required")
+    .trim()
+    .length(2, "Country code must be 2 characters (e.g., US, GB)"),
+  stripeCurrency: Yup.string()
+    .required("Default currency is required")
+    .oneOf(["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "SGD", "CHF"], "Invalid currency"),
+  stripeDescription: Yup.string().optional().trim(),
 });
 
 // Other-specific schema
@@ -128,6 +157,23 @@ export const paymentMethodSchema = Yup.object().shape({
     then: (schema) => schema.required("PayPal email is required").email("Invalid email format").trim(),
     otherwise: (schema) => schema.optional(),
   }),
+  paypalAccountType: Yup.string().when("paymentType", {
+    is: "paypal",
+    then: (schema) => schema.required("Account type is required"),
+    otherwise: (schema) => schema.optional(),
+  }),
+  paypalBusinessName: Yup.string().optional(),
+  paypalMeUsername: Yup.string().optional(),
+  paypalCountry: Yup.string().when("paymentType", {
+    is: "paypal",
+    then: (schema) => schema.required("Country is required"),
+    otherwise: (schema) => schema.optional(),
+  }),
+  paypalCurrency: Yup.string().when("paymentType", {
+    is: "paypal",
+    then: (schema) => schema.required("Primary currency is required"),
+    otherwise: (schema) => schema.optional(),
+  }),
   
   // Stripe fields
   stripeAccountId: Yup.string().when("paymentType", {
@@ -135,6 +181,27 @@ export const paymentMethodSchema = Yup.object().shape({
     then: (schema) => schema.required("Stripe account ID is required").trim(),
     otherwise: (schema) => schema.optional(),
   }),
+  stripeAccountType: Yup.string().when("paymentType", {
+    is: "stripe",
+    then: (schema) => schema.required("Account type is required"),
+    otherwise: (schema) => schema.optional(),
+  }),
+  stripeDisplayName: Yup.string().when("paymentType", {
+    is: "stripe",
+    then: (schema) => schema.required("Display name is required"),
+    otherwise: (schema) => schema.optional(),
+  }),
+  stripeCountry: Yup.string().when("paymentType", {
+    is: "stripe",
+    then: (schema) => schema.required("Country is required"),
+    otherwise: (schema) => schema.optional(),
+  }),
+  stripeCurrency: Yup.string().when("paymentType", {
+    is: "stripe",
+    then: (schema) => schema.required("Default currency is required"),
+    otherwise: (schema) => schema.optional(),
+  }),
+  stripeDescription: Yup.string().optional(),
   
   // Other fields
   otherDetails: Yup.string().when("paymentType", {

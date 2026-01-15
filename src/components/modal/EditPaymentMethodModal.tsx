@@ -21,7 +21,17 @@ type PaymentDetails = {
   cryptoNetwork?: string;
   cryptoType?: string;
   paypalEmail?: string;
+  paypalAccountType?: string;
+  paypalBusinessName?: string;
+  paypalMeUsername?: string;
+  paypalCountry?: string;
+  paypalCurrency?: string;
   stripeAccountId?: string;
+  stripeAccountType?: string;
+  stripeDisplayName?: string;
+  stripeCountry?: string;
+  stripeCurrency?: string;
+  stripeDescription?: string;
   otherDetails?: string;
 };
 
@@ -62,8 +72,18 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
       cryptoType: "BTC",
       // PayPal fields
       paypalEmail: "",
+      paypalAccountType: "personal",
+      paypalBusinessName: "",
+      paypalMeUsername: "",
+      paypalCountry: "",
+      paypalCurrency: "USD",
       // Stripe fields
       stripeAccountId: "",
+      stripeAccountType: "standard",
+      stripeDisplayName: "",
+      stripeCountry: "",
+      stripeCurrency: "USD",
+      stripeDescription: "",
       // Other fields
       otherDetails: "",
     },
@@ -100,11 +120,21 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
         case "paypal":
           updatedPaymentMethod.details = {
             paypalEmail: values.paypalEmail,
+            paypalAccountType: values.paypalAccountType,
+            paypalBusinessName: values.paypalBusinessName,
+            paypalMeUsername: values.paypalMeUsername,
+            paypalCountry: values.paypalCountry,
+            paypalCurrency: values.paypalCurrency,
           };
           break;
         case "stripe":
           updatedPaymentMethod.details = {
             stripeAccountId: values.stripeAccountId,
+            stripeAccountType: values.stripeAccountType,
+            stripeDisplayName: values.stripeDisplayName,
+            stripeCountry: values.stripeCountry,
+            stripeCurrency: values.stripeCurrency,
+            stripeDescription: values.stripeDescription,
           };
           break;
         case "other":
@@ -158,8 +188,18 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
         cryptoType: details.cryptoType || "BTC",
         // PayPal fields
         paypalEmail: details.paypalEmail || "",
+        paypalAccountType: details.paypalAccountType || "personal",
+        paypalBusinessName: details.paypalBusinessName || "",
+        paypalMeUsername: details.paypalMeUsername || "",
+        paypalCountry: details.paypalCountry || "",
+        paypalCurrency: details.paypalCurrency || "USD",
         // Stripe fields
         stripeAccountId: details.stripeAccountId || "",
+        stripeAccountType: details.stripeAccountType || "standard",
+        stripeDisplayName: details.stripeDisplayName || "",
+        stripeCountry: details.stripeCountry || "",
+        stripeCurrency: details.stripeCurrency || "USD",
+        stripeDescription: details.stripeDescription || "",
         // Other fields
         otherDetails: details.otherDetails || "",
       });
@@ -325,29 +365,171 @@ export default function EditPaymentMethodModal({ isOpen, onClose, onEdit, paymen
 
         {/* PayPal Fields */}
         {formik.values.paymentType === "paypal" && (
-          <Input
-            label="PayPal Email"
-            name="paypalEmail"
-            type="email"
-            value={formik.values.paypalEmail}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            placeholder="your@email.com"
-            error={formik.touched.paypalEmail && formik.errors.paypalEmail ? String(formik.errors.paypalEmail) : undefined}
-          />
+          <>
+            <Input
+              label="PayPal Email"
+              name="paypalEmail"
+              type="email"
+              value={formik.values.paypalEmail}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="your@email.com"
+              error={formik.touched.paypalEmail && formik.errors.paypalEmail ? String(formik.errors.paypalEmail) : undefined}
+            />
+            
+            <Dropdown
+              label="Account Type"
+              name="paypalAccountType"
+              value={formik.values.paypalAccountType}
+              onChange={(value) => formik.setFieldValue("paypalAccountType", value)}
+              options={[
+                { id: "personal", title: "Personal Account" },
+                { id: "business", title: "Business Account" },
+              ]}
+              error={formik.touched.paypalAccountType && formik.errors.paypalAccountType ? String(formik.errors.paypalAccountType) : undefined}
+            />
+
+            {formik.values.paypalAccountType === "business" && (
+              <Input
+                label="Business Name"
+                name="paypalBusinessName"
+                value={formik.values.paypalBusinessName}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Your Business Name"
+                error={formik.touched.paypalBusinessName && formik.errors.paypalBusinessName ? String(formik.errors.paypalBusinessName) : undefined}
+              />
+            )}
+
+            <Input
+              label="PayPal.Me Username (Optional)"
+              name="paypalMeUsername"
+              value={formik.values.paypalMeUsername}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="username (paypal.me/username)"
+            />
+
+            <Dropdown
+              label="Country"
+              name="paypalCountry"
+              value={formik.values.paypalCountry}
+              onChange={(value) => formik.setFieldValue("paypalCountry", value)}
+              options={[
+                { id: "US", title: "United States" },
+                { id: "GB", title: "United Kingdom" },
+                { id: "CA", title: "Canada" },
+                { id: "AU", title: "Australia" },
+                { id: "DE", title: "Germany" },
+                { id: "FR", title: "France" },
+                { id: "ES", title: "Spain" },
+                { id: "IT", title: "Italy" },
+                { id: "NL", title: "Netherlands" },
+                { id: "IN", title: "India" },
+                { id: "SG", title: "Singapore" },
+                { id: "HK", title: "Hong Kong" },
+              ]}
+              error={formik.touched.paypalCountry && formik.errors.paypalCountry ? String(formik.errors.paypalCountry) : undefined}
+            />
+
+            <Dropdown
+              label="Primary Currency"
+              name="paypalCurrency"
+              value={formik.values.paypalCurrency}
+              onChange={(value) => formik.setFieldValue("paypalCurrency", value)}
+              options={[
+                { id: "USD", title: "USD - US Dollar" },
+                { id: "EUR", title: "EUR - Euro" },
+                { id: "GBP", title: "GBP - British Pound" },
+                { id: "CAD", title: "CAD - Canadian Dollar" },
+                { id: "AUD", title: "AUD - Australian Dollar" },
+                { id: "JPY", title: "JPY - Japanese Yen" },
+                { id: "CNY", title: "CNY - Chinese Yuan" },
+                { id: "INR", title: "INR - Indian Rupee" },
+              ]}
+              error={formik.touched.paypalCurrency && formik.errors.paypalCurrency ? String(formik.errors.paypalCurrency) : undefined}
+            />
+          </>
         )}
 
         {/* Stripe Fields */}
         {formik.values.paymentType === "stripe" && (
-          <Input
-            label="Stripe Account ID"
-            name="stripeAccountId"
-            value={formik.values.stripeAccountId}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            placeholder="acct_xxxxxxxxxxxxx"
-            error={formik.touched.stripeAccountId && formik.errors.stripeAccountId ? String(formik.errors.stripeAccountId) : undefined}
-          />
+          <>
+            <Input
+              label="Stripe Account ID or Publishable Key"
+              name="stripeAccountId"
+              value={formik.values.stripeAccountId}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="acct_xxxxxxxxxxxxx or pk_live_xxxxxxxxxxxxx"
+              error={formik.touched.stripeAccountId && formik.errors.stripeAccountId ? String(formik.errors.stripeAccountId) : undefined}
+            />
+
+            <Dropdown
+              label="Account Type"
+              name="stripeAccountType"
+              value={formik.values.stripeAccountType}
+              onChange={(value) => formik.setFieldValue("stripeAccountType", value)}
+              options={[
+                { id: "standard", title: "Standard - Full Stripe Dashboard Access" },
+                { id: "express", title: "Express - Simplified Onboarding" },
+                { id: "custom", title: "Custom - Fully Branded" },
+              ]}
+              error={formik.touched.stripeAccountType && formik.errors.stripeAccountType ? String(formik.errors.stripeAccountType) : undefined}
+            />
+
+            <Input
+              label="Display Name"
+              name="stripeDisplayName"
+              value={formik.values.stripeDisplayName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Name shown to customers"
+              error={formik.touched.stripeDisplayName && formik.errors.stripeDisplayName ? String(formik.errors.stripeDisplayName) : undefined}
+            />
+
+            <Input
+              label="Country Code"
+              name="stripeCountry"
+              value={formik.values.stripeCountry}
+              onChange={(e) => formik.setFieldValue("stripeCountry", e.target.value.toUpperCase())}
+              onBlur={formik.handleBlur}
+              placeholder="US, GB, CA, etc."
+              maxLength={2}
+              error={formik.touched.stripeCountry && formik.errors.stripeCountry ? String(formik.errors.stripeCountry) : undefined}
+            />
+
+            <Dropdown
+              label="Default Currency"
+              name="stripeCurrency"
+              value={formik.values.stripeCurrency}
+              onChange={(value) => formik.setFieldValue("stripeCurrency", value)}
+              options={[
+                { id: "USD", title: "USD - US Dollar" },
+                { id: "EUR", title: "EUR - Euro" },
+                { id: "GBP", title: "GBP - British Pound" },
+                { id: "CAD", title: "CAD - Canadian Dollar" },
+                { id: "AUD", title: "AUD - Australian Dollar" },
+                { id: "JPY", title: "JPY - Japanese Yen" },
+                { id: "SGD", title: "SGD - Singapore Dollar" },
+                { id: "CHF", title: "CHF - Swiss Franc" },
+              ]}
+              error={formik.touched.stripeCurrency && formik.errors.stripeCurrency ? String(formik.errors.stripeCurrency) : undefined}
+            />
+
+            <div className="flex flex-col gap-2">
+              <label className="text-[14px]">Description (Optional)</label>
+              <textarea
+                name="stripeDescription"
+                value={formik.values.stripeDescription}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Add notes about this Stripe account"
+                rows={3}
+                className="w-full p-3 border rounded-[8px] outline-none focus:border-primary border-gray-500/[0.2]"
+              />
+            </div>
+          </>
         )}
 
         {/* Other Payment Method Fields */}

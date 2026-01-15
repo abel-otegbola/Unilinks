@@ -49,10 +49,24 @@ export default function AddPaymentMethodModal({ isOpen, onClose, onAdd }: AddPay
   });
 
   // PayPal fields
-  const [paypalEmail, setPaypalEmail] = useState<string>("");
+  const [paypal, setPaypal] = useState({
+    email: "",
+    accountType: "personal",
+    businessName: "",
+    paypalMeUsername: "",
+    country: "",
+    currency: "USD",
+  });
 
   // Stripe fields
-  const [stripeAccountId, setStripeAccountId] = useState<string>("");
+  const [stripe, setStripe] = useState({
+    accountId: "",
+    accountType: "standard",
+    displayName: "",
+    country: "",
+    currency: "USD",
+    description: "",
+  });
 
   // Other fields
   const [otherDetails, setOtherDetails] = useState<string>("");
@@ -90,8 +104,22 @@ export default function AddPaymentMethodModal({ isOpen, onClose, onAdd }: AddPay
       network: "",
       type: "BTC",
     });
-    setPaypalEmail("");
-    setStripeAccountId("");
+    setPaypal({
+      email: "",
+      accountType: "personal",
+      businessName: "",
+      paypalMeUsername: "",
+      country: "",
+      currency: "USD",
+    });
+    setStripe({
+      accountId: "",
+      accountType: "standard",
+      displayName: "",
+      country: "",
+      currency: "USD",
+      description: "",
+    });
     setOtherDetails("");
     setErrors({});
   };
@@ -111,9 +139,19 @@ export default function AddPaymentMethodModal({ isOpen, onClose, onAdd }: AddPay
       if (!crypto.walletAddress.trim()) newErrors.walletAddress = "Wallet address is required";
       if (!crypto.network.trim()) newErrors.cryptoNetwork = "Network is required";
     } else if (paymentType === "paypal") {
-      if (!paypalEmail.trim()) newErrors.paypalEmail = "PayPal email is required";
+      if (!paypal.email.trim()) newErrors.paypalEmail = "PayPal email is required";
+      if (!paypal.accountType) newErrors.paypalAccountType = "Account type is required";
+      if (paypal.accountType === "business" && !paypal.businessName.trim()) {
+        newErrors.paypalBusinessName = "Business name is required for business accounts";
+      }
+      if (!paypal.country.trim()) newErrors.paypalCountry = "Country is required";
+      if (!paypal.currency) newErrors.paypalCurrency = "Currency is required";
     } else if (paymentType === "stripe") {
-      if (!stripeAccountId.trim()) newErrors.stripeAccountId = "Stripe account ID is required";
+      if (!stripe.accountId.trim()) newErrors.stripeAccountId = "Stripe account ID is required";
+      if (!stripe.accountType) newErrors.stripeAccountType = "Account type is required";
+      if (!stripe.displayName.trim()) newErrors.stripeDisplayName = "Display name is required";
+      if (!stripe.country.trim()) newErrors.stripeCountry = "Country is required";
+      if (!stripe.currency) newErrors.stripeCurrency = "Currency is required";
     } else if (paymentType === "other") {
       if (!otherDetails.trim()) newErrors.otherDetails = "Payment details are required";
     }
@@ -156,12 +194,22 @@ export default function AddPaymentMethodModal({ isOpen, onClose, onAdd }: AddPay
         break;
       case "paypal":
         paymentMethod.details = {
-          paypalEmail,
+          paypalEmail: paypal.email,
+          paypalAccountType: paypal.accountType,
+          paypalBusinessName: paypal.businessName,
+          paypalMeUsername: paypal.paypalMeUsername,
+          paypalCountry: paypal.country,
+          paypalCurrency: paypal.currency,
         };
         break;
       case "stripe":
         paymentMethod.details = {
-          stripeAccountId,
+          stripeAccountId: stripe.accountId,
+          stripeAccountType: stripe.accountType,
+          stripeDisplayName: stripe.displayName,
+          stripeCountry: stripe.country,
+          stripeCurrency: stripe.currency,
+          stripeDescription: stripe.description,
         };
         break;
       case "other":
@@ -319,27 +367,164 @@ export default function AddPaymentMethodModal({ isOpen, onClose, onAdd }: AddPay
 
         {/* PayPal Fields */}
         {paymentType === "paypal" && (
-          <Input
-            label="PayPal Email"
-            name="paypalEmail"
-            type="email"
-            value={paypalEmail}
-            onChange={(e) => setPaypalEmail(e.target.value)}
-            placeholder="your@email.com"
-            error={errors.paypalEmail}
-          />
+          <>
+            <Input
+              label="PayPal Email"
+              name="paypalEmail"
+              type="email"
+              value={paypal.email}
+              onChange={(e) => setPaypal({ ...paypal, email: e.target.value })}
+              placeholder="your@email.com"
+              error={errors.paypalEmail}
+            />
+            
+            <Dropdown
+              label="Account Type"
+              name="paypalAccountType"
+              value={paypal.accountType}
+              onChange={(value) => setPaypal({ ...paypal, accountType: value })}
+              options={[
+                { id: "personal", title: "Personal Account" },
+                { id: "business", title: "Business Account" },
+              ]}
+              error={errors.paypalAccountType}
+            />
+
+            {paypal.accountType === "business" && (
+              <Input
+                label="Business Name"
+                name="paypalBusinessName"
+                value={paypal.businessName}
+                onChange={(e) => setPaypal({ ...paypal, businessName: e.target.value })}
+                placeholder="Your Business Name"
+                error={errors.paypalBusinessName}
+              />
+            )}
+
+            <Input
+              label="PayPal.Me Username (Optional)"
+              name="paypalMeUsername"
+              value={paypal.paypalMeUsername}
+              onChange={(e) => setPaypal({ ...paypal, paypalMeUsername: e.target.value })}
+              placeholder="username (paypal.me/username)"
+            />
+
+            <Dropdown
+              label="Country"
+              name="paypalCountry"
+              value={paypal.country}
+              onChange={(value) => setPaypal({ ...paypal, country: value })}
+              options={[
+                { id: "US", title: "United States" },
+                { id: "GB", title: "United Kingdom" },
+                { id: "CA", title: "Canada" },
+                { id: "AU", title: "Australia" },
+                { id: "DE", title: "Germany" },
+                { id: "FR", title: "France" },
+                { id: "ES", title: "Spain" },
+                { id: "IT", title: "Italy" },
+                { id: "NL", title: "Netherlands" },
+                { id: "IN", title: "India" },
+                { id: "SG", title: "Singapore" },
+                { id: "HK", title: "Hong Kong" },
+              ]}
+              error={errors.paypalCountry}
+            />
+
+            <Dropdown
+              label="Primary Currency"
+              name="paypalCurrency"
+              value={paypal.currency}
+              onChange={(value) => setPaypal({ ...paypal, currency: value })}
+              options={[
+                { id: "USD", title: "USD - US Dollar" },
+                { id: "EUR", title: "EUR - Euro" },
+                { id: "GBP", title: "GBP - British Pound" },
+                { id: "CAD", title: "CAD - Canadian Dollar" },
+                { id: "AUD", title: "AUD - Australian Dollar" },
+                { id: "JPY", title: "JPY - Japanese Yen" },
+                { id: "CNY", title: "CNY - Chinese Yuan" },
+                { id: "INR", title: "INR - Indian Rupee" },
+              ]}
+              error={errors.paypalCurrency}
+            />
+          </>
         )}
 
         {/* Stripe Fields */}
         {paymentType === "stripe" && (
-          <Input
-            label="Stripe Account ID"
-            name="stripeAccountId"
-            value={stripeAccountId}
-            onChange={(e) => setStripeAccountId(e.target.value)}
-            placeholder="acct_xxxxxxxxxxxxx"
-            error={errors.stripeAccountId}
-          />
+          <>
+            <Input
+              label="Stripe Account ID or Publishable Key"
+              name="stripeAccountId"
+              value={stripe.accountId}
+              onChange={(e) => setStripe({ ...stripe, accountId: e.target.value })}
+              placeholder="acct_xxxxxxxxxxxxx or pk_live_xxxxxxxxxxxxx"
+              error={errors.stripeAccountId}
+            />
+
+            <Dropdown
+              label="Account Type"
+              name="stripeAccountType"
+              value={stripe.accountType}
+              onChange={(value) => setStripe({ ...stripe, accountType: value })}
+              options={[
+                { id: "standard", title: "Standard - Full Stripe Dashboard Access" },
+                { id: "express", title: "Express - Simplified Onboarding" },
+                { id: "custom", title: "Custom - Fully Branded" },
+              ]}
+              error={errors.stripeAccountType}
+            />
+
+            <Input
+              label="Display Name"
+              name="stripeDisplayName"
+              value={stripe.displayName}
+              onChange={(e) => setStripe({ ...stripe, displayName: e.target.value })}
+              placeholder="Name shown to customers"
+              error={errors.stripeDisplayName}
+            />
+
+            <Input
+              label="Country Code"
+              name="stripeCountry"
+              value={stripe.country}
+              onChange={(e) => setStripe({ ...stripe, country: e.target.value.toUpperCase() })}
+              placeholder="US, GB, CA, etc."
+              maxLength={2}
+              error={errors.stripeCountry}
+            />
+
+            <Dropdown
+              label="Default Currency"
+              name="stripeCurrency"
+              value={stripe.currency}
+              onChange={(value) => setStripe({ ...stripe, currency: value })}
+              options={[
+                { id: "USD", title: "USD - US Dollar" },
+                { id: "EUR", title: "EUR - Euro" },
+                { id: "GBP", title: "GBP - British Pound" },
+                { id: "CAD", title: "CAD - Canadian Dollar" },
+                { id: "AUD", title: "AUD - Australian Dollar" },
+                { id: "JPY", title: "JPY - Japanese Yen" },
+                { id: "SGD", title: "SGD - Singapore Dollar" },
+                { id: "CHF", title: "CHF - Swiss Franc" },
+              ]}
+              error={errors.stripeCurrency}
+            />
+
+            <div className="flex flex-col gap-2">
+              <label className="text-[14px]">Description (Optional)</label>
+              <textarea
+                name="stripeDescription"
+                value={stripe.description}
+                onChange={(e) => setStripe({ ...stripe, description: e.target.value })}
+                placeholder="Add notes about this Stripe account"
+                rows={3}
+                className="w-full p-3 border rounded-[8px] outline-none focus:border-primary border-gray-500/[0.2]"
+              />
+            </div>
+          </>
         )}
 
         {/* Other Payment Method Fields */}
