@@ -1,44 +1,38 @@
 import { CurrencyCircleDollarIcon, ChartLineUpIcon, ShareNetworkIcon } from "@phosphor-icons/react";
 import Button from "../../../components/button/Button";
-import { useContext } from "react";
-import { AuthContext } from "../../../contexts/AuthContext";
-import { Link } from "react-router-dom";
 import Footer from "../../../components/footer/Footer";
+import Topbar from "../../../components/topbar/topbar";
 
 export default function Homepage() {
-  const { user } = useContext(AuthContext);
 
   return (
     <main className="bg-[url('/bg.svg')] bg-cover bg-top min-h-screen flex flex-col">
-      <header className="flex justify-between items-center lg:px-[6%] md:px-[3%] p-4">
-        <img src="/logo.svg" alt="UniLinks logo" width={64} height={32} className="sm:ml-0 ml-1" />
+      <Topbar />
 
-        {user ? (
-          <Link to="/account">
-            <img src="/profile.jpg" alt="Profile" className="w-10 h-10 rounded-full shadow border border-white outline outline-primary/[0.2] outline-offset-2" />
-          </Link>
-        ) : (
-        <Button variant="secondary" size="small" href="/auth/login" className="">Login</Button>
-        )}
-      </header>
+      <section className="flex md:flex-row flex-col sm:items-start 2xl:gap-8 md:gap-6 gap-4 md:px-[6%] p-4 md:py-10 py-4 bg-primary/[0.01] pb-24">
+        <div className="flex flex-col md:gap-4 gap-2 md:w-[40%] w-full py-6">
+          <h2 className="md:text-[52px] sm:text-[40px] text-[32px] max-w-2xl leading-[120%] font-semibold">
+            Get Paid Anywhere With One Secure Link
+          </h2>
 
-      <section className="flex flex-col sm:items-center 2xl:gap-8 md:gap-6 gap-4 2xl:p-12 md:p-10 p-4 py-24">
-        <h2 className="md:text-[48px] text-[40px] max-w-2xl leading-[120%] font-semibold sm:text-center">
-          Create Payment Links That Convert in Seconds
-        </h2>
+          <p className="max-w-2xl leading-[24px] md:mb-4 mb-2">
+            Create a single payment link your clients can trust. Accept multiple payment methods, track payments in real time, and receive instant confirmations—all from one clean, secure dashboard.
+          </p>
 
-        <p className="sm:text-center max-w-2xl leading-[24px] mb-4">
-          The modern payment link generator for freelancers, businesses, and creators. Accept payments via crypto, bank transfer, PayPal, and Stripe with custom branded links. Get paid faster with real-time tracking and instant notifications.
-        </p>
+          <Button className="z-2" href="/auth/login">Get Started for free</Button>
+          <img src="/users.png" alt="UniLinks app mockup" width={174} height={54} className="md:mt-8 mt-4" />
 
-        <Button className="z-2" href="/auth/login">Get Started for free</Button>
+        </div>
+
+        <div className="p-4 md:w-[60%] w-full">
+          <img src="/hero-bg.png" alt="UniLinks app mockup" width={1920} height={1080} className="md:w-[75%] w-full h-auto mt-auto mx-auto" />
+        </div>
+
       </section>
 
-      <div className="p-4 mb-6">
-        <img src="/hero-bg.png" alt="UniLinks app mockup" width={1920} height={1080} className="md:w-[75%] w-full h-auto mt-auto mx-auto" />
-      </div>
 
-      <section className="flex flex-col gap-10 lg:p-[6%] md:p-[3%] p-4 md:mx-[5%] mb-12 md:shadow-lg rounded-[12px] bg-white">
+
+      <section className="flex flex-col gap-10 lg:p-[6%] md:p-[3%] p-4 md:mx-[5%] mb-12 md:shadow-lg rounded-[12px] bg-white -mt-12">
         <div className="grid md:grid-cols-2 items-center gap-[60px]">
           <div className="flex flex-col gap-4">
             <p className="font-medium text-primary uppercase">Enterprise-Grade Security</p>

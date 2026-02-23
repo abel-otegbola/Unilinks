@@ -30,12 +30,10 @@ function AuthOverlay() {
   }, [activeSlider]);
 
   return (
-    <div className="h-screen sticky top-0 bg-[url('/auth-bg.png')] bg-cover bg-top 2xl:w-[35%] xl:w-[30%] md:w-[35%] md:block hidden relative">
+    <div className="h-screen sticky top-0 bg-[url('/auth-bg.png')] bg-cover 2xl:w-[35%] xl:w-[30%] md:w-[35%] md:block hidden relative">
 
       {/* Content Overlay */}
-      <div className="relative flex flex-col h-full justify-between gap-6 w-full">
-
-        <h1 className="text-white font-bold text-[32px] leading-[40px] tracking-[-1%] p-[12%]">Link cafe</h1>
+      <div className="relative flex flex-col h-full justify-end gap-6 w-full">
 
         <div className="bg-gradient-to-b via-black/[0.6] to-black px-[12%] pb-[5%] pt-[28%]">
           <div className="relative h-[170px] min-[1920px]:h-[140px] overflow-hidden">

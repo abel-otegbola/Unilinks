@@ -20,10 +20,7 @@ export default function Login() {
   }, [])
 
   return (
-    <div className="h-screen flex sm:items-center justify-between">
-      
-      {/* 2xl:w-[54.375%] xl:w-[55%] md:w-[55%] */}
-      <div className="flex items-center justify-center pt-[10%] h-full w-full">
+      <div className="flex items-center justify-center h-full w-full">
         <div className="2xl:w-[629px] sm:w-[440px] md:mx-0 mx-auto w-full p-8">
           <div className="relative flex flex-col justify-center 2xl:gap-12 gap-8">
             <div>
@@ -108,7 +105,6 @@ export default function Login() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
 

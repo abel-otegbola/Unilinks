@@ -36,9 +36,9 @@ export default function Toast({ message, type = "success", duration = 5000, time
   return (
     <div
       className={`
-        bg-[#FFF5F4] p-4 font-bold
+        bg-[#FFF5F4] p-4 font-bold fixed bottom-4 right-4 -translate-x-1/2 rounded-lg shadow-lg z-[9999]
         transition-all duration-300 ease-out overflow-hidden
-        ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full'}
+        ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}
       `}
     >
       <p className={type === "error" ? "text-red" : "text-green"}>
